@@ -20,7 +20,8 @@ AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'})
 
 const poolData = {
     UserPoolId: AWS_USER_POOL_ID,
-    ClientId: AWS_USER_POOL_CLIENT_ID
+    ClientId: AWS_USER_POOL_CLIENT_ID,
+    Paranoia : 7
 };
 
 const userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);

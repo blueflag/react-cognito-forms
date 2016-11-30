@@ -1,7 +1,7 @@
 {
   "name": "react-cognito-forms",
   "version": "0.1.1",
-  "description": "",
+  "description": "Forms built using React to handle common AWS Cognito tasks eg. Login, Forgot Password, Signup, Multi Factor Authentication and more",
   "main": "lib/aws.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
