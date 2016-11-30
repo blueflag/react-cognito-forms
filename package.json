@@ -2,9 +2,11 @@
   "name": "react-cognito-forms",
   "version": "0.1.0",
   "description": "",
-  "main": "aws.js",
+  "main": "lib/aws.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "rm -rf lib; BABEL_ENV=build babel src -d lib",
+    "watch": "BABEL_ENV=build babel src -d lib --watch"
   },
   "repository": {
     "type": "git",
@@ -15,5 +17,21 @@
   "bugs": {
     "url": "https://github.com/blueflag/react-cognito-forms/issues"
   },
-  "homepage": "https://github.com/blueflag/react-cognito-forms#readme"
+  "homepage": "https://github.com/blueflag/react-cognito-forms#readme",
+  "devDependencies": {
+    "babel-core": "^6.11.4",
+    "babel-plugin-react-transform": "2.0.2",
+    "babel-plugin-transform-class-properties": "^6.4.0",
+    "babel-plugin-transform-runtime": "^6.9.0",
+    "babel-plugin-transform-strict-mode": "^6.3.13",
+    "babel-preset-es2015": "6.9.0",
+    "babel-preset-react": "^6.11.1",
+    "babel-preset-stage-3": "^6.11.0",
+    "react": "^15.4.1",
+    "react-router": "^3.0.0"
+  },
+  "peerDependencies": {
+    "react": "15.x",
+    "react-router": "3.x"
+  }
 }
