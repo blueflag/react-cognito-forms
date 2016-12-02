@@ -1,7 +1,9 @@
 /* @flow */
 
-// Docs: http://docs.aws.amazon.com/cognito/latest/developerguide/using-amazon-cognito-user-identity-pools-javascript-examples.html
+// Minified modules that get loaded on to the global scope
+import '../lib/amazon-cognito-identity-js';
 
+// Docs: http://docs.aws.amazon.com/cognito/latest/developerguide/using-amazon-cognito-user-identity-pools-javascript-examples.html
 const {
     AWS_REGION,
     AWS_IDENTITY_POOL_ID,

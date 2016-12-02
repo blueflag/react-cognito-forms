@@ -33,6 +33,7 @@ export default class LoginForm extends React.Component {
         this.onLogin = this.onLogin.bind(this);
         this.onVerified = this.onVerified.bind(this);
         this.onTokenChange = this.onTokenChange.bind(this);
+        this.renderForm = this.renderForm.bind(this);
     }
     componentDidMount() {
         subscribeTokenChange(this.onTokenChange);
@@ -46,9 +47,9 @@ export default class LoginForm extends React.Component {
     }
     onLogin(e: Event) {
         e.preventDefault();
-
-        const username = this.refs.username.value;
-        const password = this.refs.password.value;
+        
+        const username = this.username.value;
+        const password = this.password.value;
 
         this.setState({
             username,
@@ -120,25 +121,23 @@ export default class LoginForm extends React.Component {
     renderForm(): React.Element {
         const {forgotPasswordPath, signUpPath} = this.props;
 
-        return (
-            <div className="Login_form">
-                {this.props.logo}
-                <form onSubmit={this.onLogin}>
-                    <label>Email</label>
-                    <input className="Input Input-text" type="email" name="username" ref="username" placeholder="Email" />
-                    <label>Password</label>
-                    <input className="Input Input-text" type="password" name="password" ref="password" placeholder="Password" />
-                    <button className="Button w100" type="submit">Sign In</button>
-                </form>
+        return <div className="Login_form">
+            {this.props.logo}
+            <form onSubmit={this.onLogin}>
+                <label>Email</label>
+                <input className="Input Input-text" type="email" name="username" ref={ii => this.username = ii} placeholder="Email" />
+                <label>Password</label>
+                <input className="Input Input-text" type="password" name="password" ref={ii => this.password = ii} placeholder="Password" />
+                <button className="Button w100" type="submit">Sign In</button>
+            </form>
 
-                <small className="t-muted block margin-row">
-                    {signUpPath ? <a href={signUpPath} className="float-right">Create an account</a> : null}
-                    {forgotPasswordPath ? <a href={forgotPasswordPath}>Forgot your password?</a> : null}
-                </small>
+            <small className="t-muted block margin-row">
+                {signUpPath ? <a href={signUpPath} className="float-right">Create an account</a> : null}
+                {forgotPasswordPath ? <a href={forgotPasswordPath}>Forgot your password?</a> : null}
+            </small>
 
-                <Errors errors={this.state.errors} />
-            </div>
-        );
+            <Errors errors={this.state.errors} />
+        </div>;
     }
     renderLoading(): React.Element {
         if (this.props.loader) {

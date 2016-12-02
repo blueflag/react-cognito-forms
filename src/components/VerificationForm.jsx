@@ -1,9 +1,7 @@
 /* @flow */
 
 import React from 'react';
-
 import {confirmRegistration, resendConfirmationCode} from '../aws';
-
 import Errors from './Errors';
 
 export default class VerificationForm extends React.Component {
@@ -29,7 +27,7 @@ export default class VerificationForm extends React.Component {
     onVerify(e: Event) {
         e.preventDefault();
 
-        const verification = this.refs.verification.value;
+        const verification = this.verification.value;
 
         confirmRegistration(this.props.username, verification)
             .then(() => {
@@ -55,7 +53,7 @@ export default class VerificationForm extends React.Component {
             <div className="Login_wrapper">
                 <div className="Login_form">
                     <form onSubmit={this.onVerify}>
-                        <input className="Input Input-text" type="text" name="verification" ref="verification" placeholder="Verification Code" />
+                        <input className="Input Input-text" type="text" name="verification" ref={ii => this.verification = ii} placeholder="Verification Code" />
                         <button className="Button w100" type="submit">Confirm</button>
                     </form>
 
