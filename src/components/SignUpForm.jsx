@@ -67,6 +67,7 @@ export default class SignUpForm extends React.Component {
         return (newValue: Object) => {
             this.setState({
                 signup: {
+                    ...this.state.signup,
                     [key]: newValue
                 }
             });
@@ -74,24 +75,27 @@ export default class SignUpForm extends React.Component {
     }
 
     getValues(): Object {
-        const {refs} = this;
+        const {signup} = this.state;
 
         return this.props.fields
-            .filter((ff: Object): bool => {
+            .filter((ff: Object): boolean => {
                 if (ff.required) {
                     return true;
                 }
 
                 // Ignore fields that are empty and not required
-                return !!refs[ff.name].value;
+                return !!signup[ff.name];
             })
-            .map((ff: Object): Object => ({ [ff.name]: refs[ff.name].value }))
-            .reduce((acc: Object, val: Object): Object => Object.assign(acc, val), {});
+            .reduce((reduction: Object, field: Object): Object => {
+                reduction[field.name] = signup[field.name];
+                return reduction;
+            }, {});
     }
     onSubmit(e: Event) {
         e.preventDefault();
 
         const attributes = this.getValues();
+        console.log(attributes);
         const isValid = this.onValidate(attributes);
 
         if (isValid) {
@@ -103,7 +107,7 @@ export default class SignUpForm extends React.Component {
             delete attributes[this.props.passwordConfirmKey];
 
             signUp(username, password, attributes)
-                .then((x) => {
+                .then(() => {
                     this.setState({newUser: true});
                 })
                 .catch((err: Error) => {
@@ -115,12 +119,12 @@ export default class SignUpForm extends React.Component {
             this.setState({errors: []});
         }
     }
-    onValidate(attributes: Object): bool {
+    onValidate(attributes: Object): boolean {
         const validationErrors = [];
 
         // Passwords must match
         if (attributes[this.props.passwordKey] !== attributes[this.props.passwordConfirmKey]) {
-            validationErrors.push('Paswords do not match');
+            validationErrors.push('Passwords do not match');
         }
 
         if (validationErrors.length > 0) {
@@ -130,47 +134,46 @@ export default class SignUpForm extends React.Component {
 
         return true;
     }
-    render() {
+    render(): React.Element<any> {
+        if(this.state.newUser) {
+            return this.props.renderForm({
+                view: 'signupComplete',
+                children: <span>
+                    <span>User created successfully. </span>
+                    <a href="/">Please login.</a>
+                </span>
+            });
+        }
+
         return this.props.renderForm({
             view: 'signup',
-            children: this.state.newUser
-                ? this.renderCompleted()
-                : this.renderForm()
-
+            children: this.renderForm()
         });
     }
-    renderForm() {
+    renderForm(): React.Element<any> {
         return <div>
             <form onSubmit={this.onSubmit}>
                 {this.renderFields()}
-                {this.renderSubmitButton()}
+                {this.state.isSaving ? null : <Button type="submit">Sign Up</Button>}
             </form>
             <Errors errors={this.state.errors} />
         </div>;
     }
-    renderFields() {
-        const {fields} = this.props;
-
-        return fields.map((field: Object) => {
-            const {name, type, title, placeholder, ...rest} = field;
-            return <div key={name} className="marginRow2">
-                <label>{title}</label>
-                <Input
-                    name={name}
-                    type={type}
-                    onChange={this.onChange(name)}
-                    placeholder={placeholder}
-                    {...rest}
-                />
-            </div>
-        });
-    }
-    renderSubmitButton() {
-        return this.state.isSaving
-            ? null
-            : <Button className="w100" type="submit">Sign Up</Button>;
-    }
-    renderCompleted() {
-        return <h1>User created successfully. User can now login.</h1>;
+    renderFields(): React.Element<any> {
+        return this.props
+            .fields
+            .map((field: Object) => {
+                const {name, type, title, placeholder, ...rest} = field;
+                return <div key={name} className="ReactCognitoField">
+                    <label>{title}</label>
+                    <Input
+                        name={name}
+                        type={type}
+                        onChange={this.onChange(name)}
+                        placeholder={placeholder}
+                        {...rest}
+                    />
+                </div>
+            });
     }
 }

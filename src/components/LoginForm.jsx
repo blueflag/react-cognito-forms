@@ -142,18 +142,18 @@ export default class LoginForm extends React.Component {
         const {forgotPasswordPath, signUpPath} = this.props;
 
         return <div>
-            <form onSubmit={this.onLogin}>
+            <form className="ReactCognitoForm" onSubmit={this.onLogin}>
                 <label>Email</label>
                 <Input type="email" name="email" placeholder="Email" onChange={this.onChange('username')}/>
                 <label>Password</label>
                 <Input type="password" name="password" placeholder="Password" onChange={this.onChange('password')}/>
-                <Button className="w100" type="submit">Sign In</Button>
+                <Button type="submit">Sign In</Button>
             </form>
 
-            <small className="t-muted block margin-row">
-                {signUpPath ? <a href={signUpPath} className="float-right">Create an account</a> : null}
-                {forgotPasswordPath ? <a href={forgotPasswordPath}>Forgot your password?</a> : null}
-            </small>
+            <div>
+                {signUpPath ? <a className="ReactCognitoLink ReactCognitoLink-signup" href={signUpPath}>Create an account</a> : null}
+                {forgotPasswordPath ? <a className="ReactCognitoLink ReactCognitoLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a> : null}
+            </div>
 
             <Errors errors={this.state.errors} />
         </div>;

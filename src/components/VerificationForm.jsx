@@ -1,5 +1,4 @@
 /* @flow */
-
 import React from 'react';
 import {confirmRegistration, resendConfirmationCode} from '../aws';
 import Errors from './Errors';
@@ -54,17 +53,15 @@ export default class VerificationForm extends React.Component {
                 this.setState({errors: [err.message]});
             });
     }
-    render() {
+    render(): React.Element {
         return <div>
-            <form onSubmit={this.onVerify}>
+            <form className="ReactCognitoForm" onSubmit={this.onVerify}>
                 <label>Verification Code</label>
                 <Input placeholder="Verification Code" onChange={this.onChange('verification')} />
-                <Button className="w100" type="submit">Confirm</Button>
+                <Button type="submit">Confirm</Button>
             </form>
 
-            <small className="t-muted block margin-row">
-                <a href="" onClick={this.onResendVerificationCode}>Resend verification code</a>
-            </small>
+            <a className="ReactCognitoLink ReactCognitoLink-resendVerification" onClick={this.onResendVerificationCode}>Resend verification code</a>
 
             {
                 this.state.verificationCodeSent
