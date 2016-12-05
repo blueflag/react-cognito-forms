@@ -3,6 +3,8 @@
 import React from 'react';
 import {confirmRegistration, resendConfirmationCode} from '../aws';
 import Errors from './Errors';
+import Input from 'stampy/lib/input/input/Input';
+import Button from 'stampy/lib/component/button/Button';
 
 export default class VerificationForm extends React.Component {
     static propTypes = {
@@ -21,15 +23,19 @@ export default class VerificationForm extends React.Component {
             errors: []
         };
 
+        this.onChange = this.onChange.bind(this);
         this.onVerify = this.onVerify.bind(this);
         this.onResendVerificationCode = this.onResendVerificationCode.bind(this);
+    }
+    onChange(key: string): Function {
+        return (newValue: Object) => {
+            this.setState({[key]: newValue});
+        }
     }
     onVerify(e: Event) {
         e.preventDefault();
 
-        const verification = this.verification.value;
-
-        confirmRegistration(this.props.username, verification)
+        confirmRegistration(this.props.username, this.state.verification)
             .then(() => {
                 this.props.onVerified();
             })
@@ -49,27 +55,24 @@ export default class VerificationForm extends React.Component {
             });
     }
     render() {
-        return <div className="Login">
-            <div className="Login_wrapper">
-                <div className="Login_form">
-                    <form onSubmit={this.onVerify}>
-                        <input className="Input Input-text" type="text" name="verification" ref={ii => this.verification = ii} placeholder="Verification Code" />
-                        <button className="Button w100" type="submit">Confirm</button>
-                    </form>
+        return <div>
+            <form onSubmit={this.onVerify}>
+                <label>Verification Code</label>
+                <Input placeholder="Verification Code" onChange={this.onChange('verification')} />
+                <Button className="w100" type="submit">Confirm</Button>
+            </form>
 
-                    <small className="t-muted block margin-row">
-                        <a href="" onClick={this.onResendVerificationCode}>Resend verification code</a>
-                    </small>
+            <small className="t-muted block margin-row">
+                <a href="" onClick={this.onResendVerificationCode}>Resend verification code</a>
+            </small>
 
-                    {
-                        this.state.verificationCodeSent
-                            ? <div>Verification code has been sent!</div>
-                            : null
-                    }
+            {
+                this.state.verificationCodeSent
+                    ? <div>Verification code has been sent!</div>
+                    : null
+            }
 
-                    <Errors errors={this.state.errors} />
-                </div>
-            </div>
+            <Errors errors={this.state.errors} />
         </div>;
     }
 }

@@ -1,19 +1,26 @@
 /* @flow */
 
-import React from 'react';
+import React, {PropTypes} from 'react';
 import {signIn, getJwtToken, subscribeTokenChange, updateJwtToken} from '../aws';
+import Input from 'stampy/lib/input/input/Input';
+import Button from 'stampy/lib/component/button/Button';
 
 import VerificationForm from './VerificationForm';
 import Errors from './Errors';
+import Login from './Login';
 
 export default class LoginForm extends React.Component {
     static propTypes = {
-        location: React.PropTypes.object.isRequired,
-        exclude: React.PropTypes.arrayOf(React.PropTypes.string).isRequired,
-        onTokenChange: React.PropTypes.func,
-        loader: React.PropTypes.func,
-        signUpPath: React.PropTypes.string,
-        forgotPasswordPath: React.PropTypes.string
+        location: PropTypes.object.isRequired,
+        exclude: PropTypes.arrayOf(PropTypes.string).isRequired,
+        onTokenChange: PropTypes.func,
+        loader: PropTypes.func,
+        signUpPath: PropTypes.string,
+        forgotPasswordPath: PropTypes.string
+    };
+
+    static defaultProps = {
+        renderForm: props => props.children
     };
 
     state: Object;
@@ -31,6 +38,7 @@ export default class LoginForm extends React.Component {
         };
 
         this.onLogin = this.onLogin.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.onVerified = this.onVerified.bind(this);
         this.onTokenChange = this.onTokenChange.bind(this);
         this.renderForm = this.renderForm.bind(this);
@@ -45,11 +53,15 @@ export default class LoginForm extends React.Component {
             this.props.onTokenChange(this.state.token);
         }
     }
+    onChange(key: string): Function {
+        return (newValue: Object) => {
+            this.setState({[key]: newValue});
+        }
+    }
     onLogin(e: Event) {
         e.preventDefault();
-        
-        const username = this.username.value;
-        const password = this.password.value;
+
+        const {username, password} = this.state;
 
         this.setState({
             username,
@@ -87,10 +99,11 @@ export default class LoginForm extends React.Component {
     shouldExcludePath(): bool {
         const {location: {pathname}, exclude} = this.props;
 
-        if (!exclude) { return false; }
+        if (!exclude) {
+            return false;
+        }
 
         const shouldExcldue = exclude.find((path: string): bool => {
-
             return pathname.startsWith(path);
         });
 
@@ -98,37 +111,43 @@ export default class LoginForm extends React.Component {
     }
     render(): React.Element {
         const {token, verify, username, loading} = this.state;
-        const {className = ''} = this.props;
+        const {renderForm} = this.props;
 
         // User has yet to be verified
         if (verify === true) {
-            return <VerificationForm username={username} onVerified={this.onVerified} className={className}/>;
+            return renderForm({
+                view: 'verification',
+                children: <VerificationForm username={username} onVerified={this.onVerified} />
+            });
         }
-
         // Only allow authenticated users
         if (!token && !this.shouldExcludePath()) {
-            return (
-                <div className={`Login ${className}`}>
-                    <div className="Login_wrapper">
-                        {loading ? this.renderLoading() : this.renderForm()}
-                    </div>
-                </div>
-            );
+            if(!loading) {
+                return renderForm({
+                    view: 'login',
+                    children: this.renderForm()
+                });
+
+            } else {
+                return renderForm({
+                    view: 'loading',
+                    children: <div>Loading...</div>
+                });
+            }
         }
 
-        return <div className={className}>{this.props.children}</div>;
+        return <div>{this.props.children}</div>;
     }
     renderForm(): React.Element {
         const {forgotPasswordPath, signUpPath} = this.props;
 
-        return <div className="Login_form">
-            {this.props.logo}
+        return <div>
             <form onSubmit={this.onLogin}>
                 <label>Email</label>
-                <input className="Input Input-text" type="email" name="username" ref={ii => this.username = ii} placeholder="Email" />
+                <Input type="email" name="email" placeholder="Email" onChange={this.onChange('username')}/>
                 <label>Password</label>
-                <input className="Input Input-text" type="password" name="password" ref={ii => this.password = ii} placeholder="Password" />
-                <button className="Button w100" type="submit">Sign In</button>
+                <Input type="password" name="password" placeholder="Password" onChange={this.onChange('password')}/>
+                <Button className="w100" type="submit">Sign In</Button>
             </form>
 
             <small className="t-muted block margin-row">
@@ -138,12 +157,5 @@ export default class LoginForm extends React.Component {
 
             <Errors errors={this.state.errors} />
         </div>;
-    }
-    renderLoading(): React.Element {
-        if (this.props.loader) {
-            return this.props.loader();
-        }
-
-        return <div>Loading...</div>;
     }
 }

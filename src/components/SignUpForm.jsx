@@ -1,17 +1,49 @@
 /* @flow */
 
 import React from 'react';
-
 import {signUp} from '../aws';
-
 import Errors from './Errors';
+import Input from 'stampy/lib/input/input/Input';
+import Button from 'stampy/lib/component/button/Button';
 
 export default class SignUpForm extends React.Component {
     static propTypes = {
-        fields: React.PropTypes.arrayOf(React.PropTypes.object).isRequired,
-        usernameKey: React.PropTypes.string.isRequired,
-        passwordKey: React.PropTypes.string.isRequired,
-        passwordConfirmKey: React.PropTypes.string.isRequired
+        fields: React.PropTypes.arrayOf(React.PropTypes.object),
+        usernameKey: React.PropTypes.string,
+        passwordKey: React.PropTypes.string,
+        passwordConfirmKey: React.PropTypes.string
+    };
+
+    static defaultProps = {
+        renderForm: props => props.children,
+        fields: [
+            {
+                name: 'name',
+                title: 'Full Name',
+                required: true
+            },
+            {
+                name: 'email',
+                title: 'Email',
+                type: 'email',
+                required: true
+            },
+            {
+                name: 'password',
+                title: 'Password',
+                type: 'password',
+                required: true
+            },
+            {
+                name: 'passwordConfirm',
+                title: 'Confirm Password',
+                type: 'password',
+                required: true
+            }
+        ],
+        usernameKey: 'email',
+        passwordKey: 'password',
+        passwordConfirmKey: 'passwordConfirm'
     };
 
     state: Object;
@@ -31,20 +63,30 @@ export default class SignUpForm extends React.Component {
         this.onSubmit = this.onSubmit.bind(this);
         this.onValidate = this.onValidate.bind(this);
     }
+    onChange(key: string): Function {
+        return (newValue: Object) => {
+            this.setState({
+                signup: {
+                    [key]: newValue
+                }
+            });
+        }
+    }
+
     getValues(): Object {
         const {refs} = this;
 
         return this.props.fields
-                .filter((f: Object): bool => {
-                    if (f.required) {
-                        return true;
-                    }
+            .filter((ff: Object): bool => {
+                if (ff.required) {
+                    return true;
+                }
 
-                    // Ignore fields that are empty and not required
-                    return !!refs[f.name].value;
-                })
-                .map((f: Object): Object => ({ [f.name]: refs[f.name].value }))
-                .reduce((acc: Object, val: Object): Object => Object.assign(acc, val), {});
+                // Ignore fields that are empty and not required
+                return !!refs[ff.name].value;
+            })
+            .map((ff: Object): Object => ({ [ff.name]: refs[ff.name].value }))
+            .reduce((acc: Object, val: Object): Object => Object.assign(acc, val), {});
     }
     onSubmit(e: Event) {
         e.preventDefault();
@@ -62,7 +104,6 @@ export default class SignUpForm extends React.Component {
 
             signUp(username, password, attributes)
                 .then((x) => {
-                    console.log('Created attributes...', x);
                     this.setState({newUser: true});
                 })
                 .catch((err: Error) => {
@@ -90,28 +131,20 @@ export default class SignUpForm extends React.Component {
         return true;
     }
     render() {
-        return (
-            <div className="Login">
-                <div className="Login_wrapper">
-                    <div className="Login_form">
-                        {
-                            this.state.newUser
-                                ? this.renderCompleted()
-                                : this.renderForm()
-                        }
-                    </div>
-                </div>
-            </div>
-        );
+        return this.props.renderForm({
+            view: 'signup',
+            children: this.state.newUser
+                ? this.renderCompleted()
+                : this.renderForm()
+
+        });
     }
     renderForm() {
         return <div>
             <form onSubmit={this.onSubmit}>
-                <h1>Sign Up</h1>
                 {this.renderFields()}
                 {this.renderSubmitButton()}
             </form>
-
             <Errors errors={this.state.errors} />
         </div>;
     }
@@ -119,27 +152,25 @@ export default class SignUpForm extends React.Component {
         const {fields} = this.props;
 
         return fields.map((field: Object) => {
-            return <div className="marginRow2">
-                <label htmlFor="">{field.title}</label>
-                <input
-                    key={field.name}
-                    ref={field.name}
-                    type={field.type || 'text'}
-                    className="Input Input-text"
-                    placeholder={field.placeholder}
-                    {...field}
+            const {name, type, title, placeholder, ...rest} = field;
+            return <div key={name} className="marginRow2">
+                <label>{title}</label>
+                <Input
+                    name={name}
+                    type={type}
+                    onChange={this.onChange(name)}
+                    placeholder={placeholder}
+                    {...rest}
                 />
             </div>
         });
     }
     renderSubmitButton() {
         return this.state.isSaving
-                ? null
-                : <button className="Button w100" type="submit">Sign Up</button>;
+            ? null
+            : <Button className="w100" type="submit">Sign Up</Button>;
     }
     renderCompleted() {
-        return (
-            <h1>User created successfully. User can now login.</h1>
-        );
+        return <h1>User created successfully. User can now login.</h1>;
     }
 }

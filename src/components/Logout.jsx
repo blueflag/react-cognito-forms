@@ -2,19 +2,16 @@
 
 import React from 'react';
 import {signOut} from '../aws';
+import Login from './Login';
 
 export default class Logout extends React.Component {
-    componentDidMount() {
+    componentWillMount() {
         signOut();
 
         // Send user to homepage
         window.location = '/';
     }
     render() {
-        return (
-            <div>
-                Logging out...
-            </div>
-        );
+        return <div>Logging out...</div>;
     }
 }
