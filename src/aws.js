@@ -34,15 +34,6 @@ let jwtToken = null;
 let tokenChangeSubscriptions = [];
 
 /*
- *  Init
- */
-function init() {
-    updateJwtToken();
-}
-
-init();
-
-/*
  *  Get JWT for currently logged in user
  */
 export function getJwtToken(): string|null {
