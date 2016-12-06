@@ -2,7 +2,6 @@
 
 import React from 'react';
 import {signOut} from '../aws';
-import Login from './Login';
 
 export default class Logout extends React.Component {
     componentWillMount() {

@@ -7,7 +7,6 @@ import Button from 'stampy/lib/component/button/Button';
 
 import VerificationForm from './VerificationForm';
 import Errors from './Errors';
-import Login from './Login';
 
 export default class LoginForm extends React.Component {
     static propTypes = {
