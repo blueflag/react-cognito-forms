@@ -1,7 +1,12 @@
 /* @flow */
+import {
+    CognitoUserPool,
+    AuthenticationDetails,
+    CognitoUser,
+    CognitoUserAttribute
+} from 'amazon-cognito-identity-js';
 
-// Minified modules that get loaded on to the global scope
-import '../lib/amazon-cognito-identity-js';
+import {Config, CognitoIdentityCredentials} from 'aws-sdk/lib/core';
 
 // Docs: http://docs.aws.amazon.com/cognito/latest/developerguide/using-amazon-cognito-user-identity-pools-javascript-examples.html
 const {
@@ -10,23 +15,17 @@ const {
     AWS_USER_POOL_ID,
     AWS_USER_POOL_ARN,
     AWS_USER_POOL_CLIENT_ID
-} = process.env;
+} = require('process.env');
 
-AWS.config.region = AWS_REGION;
-AWS.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: AWS_IDENTITY_POOL_ID});
-AWSCognito.config.region = AWS_REGION;
-AWSCognito.config.credentials = new AWS.CognitoIdentityCredentials({IdentityPoolId: AWS_IDENTITY_POOL_ID});
+Config.region = AWS_REGION;
+Config.credentials = new CognitoIdentityCredentials({IdentityPoolId: AWS_IDENTITY_POOL_ID});
 
-// Need to provide placeholder keys unless unauthorised user access is enabled for user pool
-AWSCognito.config.update({accessKeyId: 'anything', secretAccessKey: 'anything'});
 
-const poolData = {
+const userPool = new CognitoUserPool({
     UserPoolId: AWS_USER_POOL_ID,
     ClientId: AWS_USER_POOL_CLIENT_ID,
     Paranoia : 7
-};
-
-const userPool = new AWSCognito.CognitoIdentityServiceProvider.CognitoUserPool(poolData);
+});
 
 // Retrieve the current user from local storage
 let cognitoUser = userPool.getCurrentUser();
@@ -75,16 +74,18 @@ export function signIn(username: string, password: string): Promise {
             Pool : userPool
         };
 
-        const authenticationDetails = new AWSCognito.CognitoIdentityServiceProvider.AuthenticationDetails(authenticationData);
-        const user = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        const authenticationDetails = new AuthenticationDetails(authenticationData);
+        const user = new CognitoUser(userData);
 
         user.authenticateUser(authenticationDetails, {
             onSuccess: (session: Object) => {
                 const token = session.getAccessToken().getJwtToken();
 
-                AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+                Config.credentials = new CognitoIdentityCredentials({
                     IdentityPoolId : AWS_IDENTITY_POOL_ID,
-                    Logins : { [AWS_USER_POOL_ARN]: token }
+                    Logins: {
+                        [AWS_USER_POOL_ARN]: token
+                    }
                 });
 
                 cognitoUser = user;
@@ -122,12 +123,12 @@ export function signOut() {
 /*
  *  Register a User with the Application
  */
-export function signUp(username: string, password: string, attributes: Object) {
+export function signUp(username: string, password: string, attributes: Object): Promise {
     return new Promise((resolve: Function, reject: Function) => {
         // Build cognito attributes list
         const attributeList = Object.keys(attributes).map((k: string) => {
             const payload = { Name: k, Value: attributes[k] };
-            return new AWSCognito.CognitoIdentityServiceProvider.CognitoUserAttribute(payload);
+            return CognitoUserAttribute(payload);
         });
 
         userPool.signUp(username, password, attributeList, null, (err: Error, result: Object) => {
@@ -151,7 +152,7 @@ export function confirmRegistration(username: string, verificationCode: string):
             Pool : userPool
         };
 
-        const user = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        const user = CognitoUser(userData);
 
         user.confirmRegistration(verificationCode, true, (err, result) => {
             if (err) {
@@ -173,7 +174,7 @@ export function resendConfirmationCode(username: string): Promise {
             Pool : userPool
         };
 
-        const user = new AWSCognito.CognitoIdentityServiceProvider.CognitoUser(userData);
+        const user = CognitoUser(userData);
 
         user.resendConfirmationCode((err: Error, result: Object) => {
             if (err) {

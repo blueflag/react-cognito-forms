@@ -1,13 +1,27 @@
 var webpack = require('webpack');
+var path = require('path');
 
 module.exports = {
-    entry: './src/amazon-cognito-identity-js',
+    entry: './src/index',
     output: {
         path: 'lib',
-        filename: 'amazon-cognito-identity-js.js'
+        filename: 'index.js',
+        libraryTarget: "commonjs2"
+    },
+    // target: 'node',
+    externals: {
+        "process.env": "var process.env",
+        "react": "react"
     },
     module: {
         loaders: [
+            {
+                test: /\.jsx?$/,
+                include: [
+                    path.resolve(__dirname, './src')
+                ],
+                loader: 'babel-loader'
+            },
             {
                 test: /\.json$/,
                 loader: 'json-loader'
@@ -26,5 +40,8 @@ module.exports = {
                 warnings: false
             }
         })
-    ]
+    ],
+    resolve: {
+        extensions: ['', '.js', '.jsx']
+    }
 };
