@@ -128,16 +128,15 @@ export function signUp(username: string, password: string, attributes: Object): 
         // Build cognito attributes list
         const attributeList = Object.keys(attributes).map((k: string) => {
             const payload = { Name: k, Value: attributes[k] };
-            return CognitoUserAttribute(payload);
+            return new CognitoUserAttribute(payload);
         });
 
         userPool.signUp(username, password, attributeList, null, (err: Error, result: Object) => {
-            if (err) { return reject(err); }
+            if (err) {
+                return reject(err);
+            }
 
             return resolve(result);
-
-            // const cognitoUser = result.user;
-            // console.log('user name is ' + cognitoUser.getUsername());
         });
     });
 }
@@ -152,7 +151,7 @@ export function confirmRegistration(username: string, verificationCode: string):
             Pool : userPool
         };
 
-        const user = CognitoUser(userData);
+        const user = new CognitoUser(userData);
 
         user.confirmRegistration(verificationCode, true, (err, result) => {
             if (err) {
