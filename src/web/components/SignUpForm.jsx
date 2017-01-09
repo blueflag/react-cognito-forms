@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import {signUp} from '../aws';
+import {signUp} from '../../aws';
 import Errors from './Errors';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';

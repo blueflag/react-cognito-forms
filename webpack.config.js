@@ -2,10 +2,13 @@ var webpack = require('webpack');
 var path = require('path');
 
 module.exports = {
-    entry: './src/index',
+    entry: {
+        web: './src/web/index',
+        native: './src/native/index'
+    },
     output: {
         path: 'lib',
-        filename: 'index.js',
+        filename: '[name]/index.js',
         libraryTarget: "commonjs2"
     },
     // target: 'node',

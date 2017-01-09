@@ -2,11 +2,11 @@
   "name": "react-cognito-forms",
   "version": "0.4.1",
   "description": "Forms built using React to handle common AWS Cognito tasks eg. Login, Forgot Password, Signup, Multi Factor Authentication and more",
-  "main": "lib/index.js",
+  "main": "lib/web/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "build": "rm -rf lib; yarn webpack",
-    "watch": "yarn build -- -w",
+    "build": "rm -rf lib; yarn webpack --",
+    "watch": "yarn build -- --watch",
     "prepublish": "yarn build"
   },
   "repository": {

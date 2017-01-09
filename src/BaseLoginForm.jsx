@@ -1,31 +1,40 @@
 /* @flow */
+import React, {PropTypes, Component} from 'react';
+import {
+    signIn,
+    getJwtToken,
+    subscribeTokenChange,
+    updateJwtToken,
+    confirmRegistration,
+    resendConfirmationCode
+} from './aws';
 
-import React, {PropTypes} from 'react';
-import {signIn, getJwtToken, subscribeTokenChange, updateJwtToken} from '../aws';
-import Input from 'stampy/lib/input/input/Input';
-import Button from 'stampy/lib/component/button/Button';
-
-import VerificationForm from './VerificationForm';
-import Errors from './Errors';
-
-export default class LoginForm extends React.Component {
+export default class BaseLoginForm extends Component {
     static propTypes = {
         location: PropTypes.object.isRequired,
         exclude: PropTypes.arrayOf(PropTypes.string).isRequired,
         onTokenChange: PropTypes.func,
         loader: PropTypes.func,
         signUpPath: PropTypes.string,
-        forgotPasswordPath: PropTypes.string
+        forgotPasswordPath: PropTypes.string,
+        LoginComponent: PropTypes.func,
+        VerificationComponent: PropTypes.func,
+        LoadingComponent: PropTypes.func
     };
 
     static defaultProps = {
-        renderForm: props => props.children
+        renderForm: props => props.children,
+        LoginComponent: () => <div>loginComponent</div>,
+        VerificationComponent: () => <div>verificationComponent</div>,
+        LoadingComponent: () => <div>Loading...</div>
     };
 
-    state: Object;
     onLogin: (e: Event) => void;
-    onVerified: () => void;
+    onResendVerificationCode: (e: Event) => void;
     onTokenChange: () => void;
+    onVerified: () => void;
+    onVerify: (e: Event) => void;
+    state: Object;
 
     constructor(props: Object) {
         super(props);
@@ -36,11 +45,12 @@ export default class LoginForm extends React.Component {
             loading: true
         };
 
-        this.onLogin = this.onLogin.bind(this);
         this.onChange = this.onChange.bind(this);
-        this.onVerified = this.onVerified.bind(this);
+        this.onLogin = this.onLogin.bind(this);
+        this.onResendVerificationCode = this.onResendVerificationCode.bind(this);
         this.onTokenChange = this.onTokenChange.bind(this);
-        this.renderForm = this.renderForm.bind(this);
+        this.onVerified = this.onVerified.bind(this);
+        this.onVerify = this.onVerify.bind(this);
     }
     componentDidMount() {
         subscribeTokenChange(this.onTokenChange);
@@ -79,11 +89,16 @@ export default class LoginForm extends React.Component {
                 });
             });
     }
-    onVerified() {
-        this.setState({
-            errors: [],
-            verify: false
-        });
+    onResendVerificationCode(e: Event) {
+        e.preventDefault();
+
+        resendConfirmationCode(this.props.username)
+            .then(() => {
+                this.setState({verificationCodeSent: true});
+            })
+            .catch((err: Error) => {
+                this.setState({errors: [err.message]});
+            });
     }
     onTokenChange(token: string) {
         this.setState({
@@ -94,6 +109,23 @@ export default class LoginForm extends React.Component {
         if (this.props.onTokenChange) {
             this.props.onTokenChange(token);
         }
+    }
+    onVerified() {
+        this.setState({
+            errors: [],
+            verify: false
+        });
+    }
+    onVerify(e: Event) {
+        e.preventDefault();
+
+        confirmRegistration(this.props.username, this.state.verification)
+            .then(() => {
+                this.props.onVerified();
+            })
+            .catch((err: Error) => {
+                this.setState({errors: [err.message]});
+            })
     }
     shouldExcludePath(): bool {
         const {location: {pathname}, exclude} = this.props;
@@ -109,14 +141,31 @@ export default class LoginForm extends React.Component {
         return !!shouldExcldue;
     }
     render(): React.Element {
-        const {token, verify, username, loading} = this.state;
-        const {renderForm} = this.props;
+        const {token, verify, loading} = this.state;
+        const {
+            renderForm,
+            LoginComponent,
+            VerificationComponent,
+            LoadingComponent
+        } = this.props;
+
+        const componentProps = {
+            ...this.props,
+            ...this.state,
+            onChange: this.onChange,
+            onLogin: this.onLogin,
+            onResendVerificationCode: this.onResendVerificationCode,
+            onTokenChange: this.onTokenChange,
+            onVerified: this.onVerified,
+            onVerify: this.onVerify,
+            shouldExcludePath: this.shouldExcludePath
+        };
 
         // User has yet to be verified
         if (verify === true) {
             return renderForm({
                 view: 'verification',
-                children: <VerificationForm username={username} onVerified={this.onVerified} />
+                children: <VerificationComponent {...componentProps} />
             });
         }
         // Only allow authenticated users
@@ -124,37 +173,17 @@ export default class LoginForm extends React.Component {
             if(!loading) {
                 return renderForm({
                     view: 'login',
-                    children: this.renderForm()
+                    children: <LoginComponent {...componentProps} />
                 });
 
             } else {
                 return renderForm({
                     view: 'loading',
-                    children: <div>Loading...</div>
+                    children: <LoadingComponent {...componentProps} />
                 });
             }
         }
 
         return <div>{this.props.children}</div>;
-    }
-    renderForm(): React.Element {
-        const {forgotPasswordPath, signUpPath} = this.props;
-
-        return <div>
-            <form className="ReactCognitoForm" onSubmit={this.onLogin}>
-                <label>Email</label>
-                <Input type="email" name="email" placeholder="Email" onChange={this.onChange('username')}/>
-                <label>Password</label>
-                <Input type="password" name="password" placeholder="Password" onChange={this.onChange('password')}/>
-                <Button type="submit">Sign In</Button>
-            </form>
-
-            <div>
-                {signUpPath ? <a className="ReactCognitoLink ReactCognitoLink-signup" href={signUpPath}>Create an account</a> : null}
-                {forgotPasswordPath ? <a className="ReactCognitoLink ReactCognitoLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a> : null}
-            </div>
-
-            <Errors errors={this.state.errors} />
-        </div>;
     }
 }
