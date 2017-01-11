@@ -2,11 +2,11 @@
 import React, {PropTypes, Component} from 'react';
 import {
     signIn,
-    getJwtToken,
+    getToken,
     subscribeTokenChange,
-    updateJwtToken,
-    confirmRegistration,
-    resendConfirmationCode
+    refreshToken,
+    signUpConfirm,
+    signUpConfirmResend
 } from './aws';
 
 export default class BaseLoginForm extends Component {
@@ -41,8 +41,8 @@ export default class BaseLoginForm extends Component {
 
         this.state = {
             errors: [],
-            token: getJwtToken(),
-            loading: true
+            token: getToken(),
+            loading: false
         };
 
         this.onChange = this.onChange.bind(this);
@@ -56,7 +56,7 @@ export default class BaseLoginForm extends Component {
         subscribeTokenChange(this.onTokenChange);
 
         // Force update token after subscription
-        updateJwtToken();
+        refreshToken();
 
         if (this.state.token && this.props.onTokenChange) {
             this.props.onTokenChange(this.state.token);
@@ -78,13 +78,13 @@ export default class BaseLoginForm extends Component {
         });
 
         signIn(username, password)
-            .then((t: string) => {
-                this.onTokenChange(t);
+            .then((token: string) => {
+                this.onTokenChange(token);
             })
             .catch((err: Error) => {
                 this.setState({
-                    errors: [err.message],
-                    verify: err.message === 'User is not confirmed.',
+                    errors: [err.body.message],
+                    verify: err.body.code === 'UserNotConfirmedException',
                     loading: false
                 });
             });
@@ -92,7 +92,7 @@ export default class BaseLoginForm extends Component {
     onResendVerificationCode(e: Event) {
         e.preventDefault();
 
-        resendConfirmationCode(this.props.username)
+        signUpConfirmResend(this.state.username)
             .then(() => {
                 this.setState({verificationCodeSent: true});
             })
@@ -102,7 +102,7 @@ export default class BaseLoginForm extends Component {
     }
     onTokenChange(token: string) {
         this.setState({
-            token: token,
+            token,
             loading: false
         });
 
@@ -119,9 +119,9 @@ export default class BaseLoginForm extends Component {
     onVerify(e: Event) {
         e.preventDefault();
 
-        confirmRegistration(this.props.username, this.state.verification)
+        signUpConfirm(this.state.username, this.state.verification)
             .then(() => {
-                this.props.onVerified();
+                this.onVerified();
             })
             .catch((err: Error) => {
                 this.setState({errors: [err.message]});

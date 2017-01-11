@@ -1,61 +1,79 @@
-/* @flow */
-import {
-    CognitoUserPool,
-    AuthenticationDetails,
-    CognitoUser,
-    CognitoUserAttribute
-} from 'amazon-cognito-identity-js';
+// /* @flow */
+import superagent from 'superagent';
 
-import {Config, CognitoIdentityCredentials} from 'aws-sdk/lib/core';
-
-// Docs: http://docs.aws.amazon.com/cognito/latest/developerguide/using-amazon-cognito-user-identity-pools-javascript-examples.html
 const {
-    AWS_REGION,
-    AWS_IDENTITY_POOL_ID,
-    AWS_USER_POOL_ID,
-    AWS_USER_POOL_ARN,
-    AWS_USER_POOL_CLIENT_ID
-} = require('process.env');
+    COGNITO_GATEWAY_HOST = ''
+} = process.env;
 
-Config.region = AWS_REGION;
-Config.credentials = new CognitoIdentityCredentials({IdentityPoolId: AWS_IDENTITY_POOL_ID});
+const storagePrefix = 'react-cognito-forms';
 
+var initalLocalStorage = localStorage.getItem(storagePrefix) || {};
 
-const userPool = new CognitoUserPool({
-    UserPoolId: AWS_USER_POOL_ID,
-    ClientId: AWS_USER_POOL_CLIENT_ID,
-    Paranoia : 7
-});
+var tokenStore = {
+    accessToken: initalLocalStorage.accessToken,
+    idToken: initalLocalStorage.idToken,
+    refreshToken: initalLocalStorage.refreshToken
+};
 
-// Retrieve the current user from local storage
-let cognitoUser = userPool.getCurrentUser();
-let jwtToken = null;
-let tokenChangeSubscriptions = [];
+var tokenChangeSubscriptions = {
+    accessToken: [],
+    idToken: [],
+    refreshToken: []
+}
 
-/*
- *  Get JWT for currently logged in user
- */
-export function getJwtToken(): string|null {
-    return jwtToken;
+// signIn //
+// signOutGlobal //
+// signUp //
+// signUpConfirm //
+// signUpConfirmResend //
+// refreshToken //
+// userGet //
+// userDelete //
+
+function post(url: string, query: Object): Promise {
+    return new Promise((resolve, reject) => {
+        superagent
+            .post(`${COGNITO_GATEWAY_HOST}${url}`)
+            .set('Authorization', `Bearer ${getToken()}`)
+            .send(query)
+            .end((err, response) => {
+                if(!response) {
+                    reject(err);
+                } else if (response.ok) {
+                    resolve(response.body, response);
+                } else {
+                    reject(response);
+                }
+            });
+    });
+}
+
+function setToken(key: string, token: string) {
+    tokenStore[key] = token;
+    try {
+        localStorage.setItem(`${storagePrefix}`, JSON.stringify(tokenStore));
+    } catch(e) {
+        console.warn(e);
+    }
+    onTokenChange(key, token);
+}
+
+export function getToken(key: string = 'accessToken'): string {
+    return JSON.parse(localStorage.getItem(storagePrefix) || "{}")[key];
 }
 
 /*
  *  Update token from session
  */
-export function updateJwtToken() {
-    if (!cognitoUser) {
-        jwtToken = null;
-        onTokenChange();
-    }
-    else {
-        // Check if the user has a valid session
-        cognitoUser.getSession((err: Error, session: Object): any => {
-            jwtToken = !err && session.isValid()
-                    ? session.getAccessToken().getJwtToken()
-                    : null;
-
-            onTokenChange();
-        });
+export function refreshToken(token: string): Promise {
+    const refreshToken = token || tokenStore.refreshToken;
+    if(refreshToken) {
+        return post('/refreshToken', {refreshToken})
+            .then(({accessToken, idToken}) => {
+                setToken('accessToken', accessToken);
+                setToken('idToken', idToken);
+                return accessToken;
+            });
     }
 }
 
@@ -63,47 +81,13 @@ export function updateJwtToken() {
  *  Authenticate a User
  */
 export function signIn(username: string, password: string): Promise {
-    return new Promise((resolve: Function, reject: Function) => {
-        const authenticationData = {
-            Username : username,
-            Password : password
-        };
-
-        const userData = {
-            Username : username,
-            Pool : userPool
-        };
-
-        const authenticationDetails = new AuthenticationDetails(authenticationData);
-        const user = new CognitoUser(userData);
-
-        user.authenticateUser(authenticationDetails, {
-            onSuccess: (session: Object) => {
-                const token = session.getAccessToken().getJwtToken();
-
-                Config.credentials = new CognitoIdentityCredentials({
-                    IdentityPoolId : AWS_IDENTITY_POOL_ID,
-                    Logins: {
-                        [AWS_USER_POOL_ARN]: token
-                    }
-                });
-
-                cognitoUser = user;
-                updateJwtToken();
-
-                return resolve(token);
-            },
-            onFailure: (err: Error) => {
-                return reject(err);
-            },
-            mfaRequired: (codeDeliveryDetails: Object) => {
-                console.debug('mfa::codeDeliveryDetails', codeDeliveryDetails);
-                // var verificationCode = prompt('Please input verification code' ,'');
-                // cognitoUser.sendMFACode(verificationCode, this);
-                return reject(new Error('MFA support has not been implemented yet'));
-            }
+    return post('/signIn', {username, password})
+        .then(({accessToken, idToken, refreshToken}) => {
+            setToken('accessToken', accessToken);
+            setToken('idToken', idToken);
+            setToken('refreshToken', refreshToken);
+            return accessToken;
         });
-    });
 }
 
 
@@ -111,12 +95,17 @@ export function signIn(username: string, password: string): Promise {
  *  Sign Out
  */
 export function signOut() {
-    if (cognitoUser) {
-        cognitoUser.signOut();
-        cognitoUser = null;
+    setToken('accessToken', null);
+    setToken('idToken', null);
+    setToken('refreshToken', null);
+}
 
-        updateJwtToken();
-    }
+export function signOutGlobal(): Promise {
+    return post('/signOutGlobal')
+        .then(() => {
+            signOut();
+        });
+
 }
 
 
@@ -124,81 +113,41 @@ export function signOut() {
  *  Register a User with the Application
  */
 export function signUp(username: string, password: string, attributes: Object): Promise {
-    return new Promise((resolve: Function, reject: Function) => {
-        // Build cognito attributes list
-        const attributeList = Object.keys(attributes).map((k: string) => {
-            const payload = { Name: k, Value: attributes[k] };
-            return new CognitoUserAttribute(payload);
+    return post('/signUp', {username, password, attributes})
+        .then(({accessToken, idToken, refreshToken}) => {
+            setToken('accessToken', accessToken);
+            setToken('idToken', idToken);
+            setToken('refreshToken', refreshToken);
+            return accessToken;
         });
-
-        userPool.signUp(username, password, attributeList, null, (err: Error, result: Object) => {
-            if (err) {
-                return reject(err);
-            }
-
-            return resolve(result);
-        });
-    });
 }
 
 /*
  *  Confirm a Registered, Unauthenticated User
  */
-export function confirmRegistration(username: string, verificationCode: string): Promise {
-    return new Promise((resolve: Function, reject: Function) => {
-        const userData = {
-            Username : username,
-            Pool : userPool
-        };
-
-        const user = new CognitoUser(userData);
-
-        user.confirmRegistration(verificationCode, true, (err, result) => {
-            if (err) {
-                return reject(err);
-            }
-
-            return resolve(result);
-        });
-    });
+export function signUpConfirm(username: string, verificationCode: string): Promise {
+    return post('/signUpConfirm', {username, verificationCode});
 }
 
 /*
  *  Resends a confirmation code via SMS that confirms the registration for an unauthenticated user
  */
-export function resendConfirmationCode(username: string): Promise {
-    return new Promise((resolve: Function, reject: Function) => {
-        const userData = {
-            Username : username,
-            Pool : userPool
-        };
-
-        const user = CognitoUser(userData);
-
-        user.resendConfirmationCode((err: Error, result: Object) => {
-            if (err) {
-                return reject(err);
-            }
-
-            return resolve(result);
-        });
-    });
+export function signUpConfirmResend(username: string): Promise {
+    return post('/signUpConfirmResend', {username});
 }
 
 /*
  *  Subscribe to any token changes
  */
-export function subscribeTokenChange(cb: Function) {
+export function subscribeTokenChange(cb: Function, key: string = 'accessToken') {
     if (cb) {
-        tokenChangeSubscriptions.push(cb);
+        tokenChangeSubscriptions[key].push(cb);
     }
 }
 
 /*
  *  Notify all subscribers of token change
  */
-function onTokenChange() {
-    const token = getJwtToken();
-
-    tokenChangeSubscriptions.forEach((cb: Function) => cb(token));
+function onTokenChange(key: string, token: string) {
+    tokenChangeSubscriptions[key].forEach((cb: Function) => cb(token));
 }

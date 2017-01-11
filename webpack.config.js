@@ -11,6 +11,7 @@ module.exports = {
         filename: '[name]/index.js',
         libraryTarget: "commonjs2"
     },
+    devtool: 'source-map',
     // target: 'node',
     externals: {
         "process.env": "var process.env",

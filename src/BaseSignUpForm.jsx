@@ -102,6 +102,7 @@ export default class BaseSignUpForm extends React.Component {
         e.preventDefault();
 
         const attributes = this.getValues();
+        console.log(attributes);
         const isValid = this.onValidate(attributes);
 
         if (isValid) {

@@ -5,8 +5,7 @@
   "main": "lib/web/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "build": "rm -rf lib; yarn webpack --",
-    "watch": "yarn build -- --watch",
+    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib",
     "prepublish": "yarn build"
   },
   "repository": {
@@ -24,20 +23,17 @@
     "babel-plugin-transform-class-properties": "^6.4.0",
     "babel-plugin-transform-strict-mode": "^6.3.13",
     "babel-preset-blueflag": "^0.0.1",
-    "json-loader": "^0.5.4",
     "react": "^15.4.1",
-    "react-router": "^3.0.0",
-    "webpack": "^1.13.3"
+    "react-router": "^3.0.0"
   },
   "peerDependencies": {
     "react": "15.x",
     "react-router": "3.x"
   },
   "dependencies": {
-    "amazon-cognito-identity-js": "^1.8.0",
-    "aws-sdk": "^2.7.11",
     "babel-loader": "^6.2.8",
     "eslint-config-blueflag": "^0.3.0",
-    "stampy": "^0.7.0"
+    "stampy": "^0.7.0",
+    "superagent": "^3.3.1"
   }
 }
