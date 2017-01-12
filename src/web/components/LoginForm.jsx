@@ -7,6 +7,9 @@ import Button from 'stampy/lib/component/button/Button';
 
 import VerificationForm from './VerificationForm';
 import Errors from './Errors';
+import auth from '../auth';
+
+var LoadingComponent = () => <div>Loading...</div>
 
 function LoginComponent(props: Object): React.Element {
 
@@ -34,7 +37,9 @@ export default class LoginFormWrapper extends React.Component {
     render(): React.Element {
         return <BaseLoginForm
             {...this.props}
+            auth={auth}
             LoginComponent={LoginComponent}
+            LoadingComponent={LoadingComponent}
             VerificationComponent={VerificationForm}
         />;
     }

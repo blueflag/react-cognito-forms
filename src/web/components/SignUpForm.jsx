@@ -4,6 +4,7 @@ import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
 
 import BaseSignUpForm from '../../BaseSignUpForm';
+import auth from '../auth';
 import Errors from './Errors';
 
 function SignUpComponent(props: Object): React.Element {
@@ -50,6 +51,7 @@ SignUpComponent.propTypes = {
 export default function SignUpFormWrapper(props: Object): React.Element {
     return <BaseSignUpForm
         {...props}
+        auth={auth}
         SignUpComponent={SignUpComponent}
     />;
 }

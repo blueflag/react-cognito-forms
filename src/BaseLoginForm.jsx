@@ -1,32 +1,25 @@
 /* @flow */
 import React, {PropTypes, Component} from 'react';
-import {
-    signIn,
-    getToken,
-    subscribeTokenChange,
-    refreshToken,
-    signUpConfirm,
-    signUpConfirmResend
-} from './aws';
+import Auth from './auth';
 
 export default class BaseLoginForm extends Component {
     static propTypes = {
+        auth: PropTypes.instanceOf(Auth),
+        cognitoGatewayHost: PropTypes.string.isRequired,
         location: PropTypes.object.isRequired,
-        exclude: PropTypes.arrayOf(PropTypes.string).isRequired,
+        exclude: PropTypes.arrayOf(PropTypes.string),
         onTokenChange: PropTypes.func,
         loader: PropTypes.func,
         signUpPath: PropTypes.string,
         forgotPasswordPath: PropTypes.string,
-        LoginComponent: PropTypes.func,
-        VerificationComponent: PropTypes.func,
-        LoadingComponent: PropTypes.func
+        LoginComponent: PropTypes.func.isRequired,
+        VerificationComponent: PropTypes.func.isRequired,
+        LoadingComponent: PropTypes.func.isRequired
     };
 
     static defaultProps = {
         renderForm: props => props.children,
-        LoginComponent: () => <div>loginComponent</div>,
-        VerificationComponent: () => <div>verificationComponent</div>,
-        LoadingComponent: () => <div>Loading...</div>
+        auth: new Auth()
     };
 
     onLogin: (e: Event) => void;
@@ -39,9 +32,11 @@ export default class BaseLoginForm extends Component {
     constructor(props: Object) {
         super(props);
 
+        props.auth.setCognitoGatewayHost(props.cognitoGatewayHost);
+
         this.state = {
             errors: [],
-            token: getToken(),
+            token: null,
             loading: false
         };
 
@@ -53,10 +48,14 @@ export default class BaseLoginForm extends Component {
         this.onVerify = this.onVerify.bind(this);
     }
     componentDidMount() {
-        subscribeTokenChange(this.onTokenChange);
+        const {auth} = this.props;
+        auth.subscribeTokenChange(this.onTokenChange);
+        auth.getToken().then(token => this.setState({token}));
+
+
 
         // Force update token after subscription
-        refreshToken();
+        this.props.auth.refreshToken();
 
         if (this.state.token && this.props.onTokenChange) {
             this.props.onTokenChange(this.state.token);
@@ -77,7 +76,7 @@ export default class BaseLoginForm extends Component {
             loading: true
         });
 
-        signIn(username, password)
+        this.props.auth.signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);
             })
@@ -92,7 +91,7 @@ export default class BaseLoginForm extends Component {
     onResendVerificationCode(e: Event) {
         e.preventDefault();
 
-        signUpConfirmResend(this.state.username)
+        this.props.auth.signUpConfirmResend(this.state.username)
             .then(() => {
                 this.setState({verificationCodeSent: true});
             })
@@ -119,7 +118,7 @@ export default class BaseLoginForm extends Component {
     onVerify(e: Event) {
         e.preventDefault();
 
-        signUpConfirm(this.state.username, this.state.verification)
+        this.props.auth.signUpConfirm(this.state.username, this.state.verification)
             .then(() => {
                 this.onVerified();
             })
@@ -184,6 +183,6 @@ export default class BaseLoginForm extends Component {
             }
         }
 
-        return <div>{this.props.children}</div>;
+        return this.props.children;
     }
 }

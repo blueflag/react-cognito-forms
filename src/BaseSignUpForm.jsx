@@ -1,7 +1,7 @@
 /* @flow */
 
 import React from 'react';
-import {signUp} from './aws';
+import Auth from './auth';
 
 export default class BaseSignUpForm extends React.Component {
     static propTypes = {
@@ -14,6 +14,7 @@ export default class BaseSignUpForm extends React.Component {
     };
 
     static defaultProps = {
+        auth: new Auth(),
         renderForm: props => props.children,
         CompleteComponent: () => {
             return <span>
@@ -102,7 +103,6 @@ export default class BaseSignUpForm extends React.Component {
         e.preventDefault();
 
         const attributes = this.getValues();
-        console.log(attributes);
         const isValid = this.onValidate(attributes);
 
         if (isValid) {
@@ -113,7 +113,7 @@ export default class BaseSignUpForm extends React.Component {
             delete attributes[this.props.passwordKey];
             delete attributes[this.props.passwordConfirmKey];
 
-            signUp(username, password, attributes)
+            this.props.auth.signUp(username, password, attributes)
                 .then(() => {
                     this.setState({newUser: true});
                 })

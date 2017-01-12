@@ -1,11 +1,11 @@
 /* @flow */
 
 import React from 'react';
-import {signOut} from '../../aws';
+import auth from '../auth';
 
 export default class Logout extends React.Component {
     componentWillMount() {
-        signOut();
+        auth.signOut();
 
         // Send user to homepage
         window.location = '/';

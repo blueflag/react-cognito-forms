@@ -5,7 +5,7 @@
   "main": "lib/web/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\"",
-    "build": "rm -rf lib && NODE_ENV=production babel src --out-dir lib",
+    "build": "rm -rf lib && NODE_ENV=production babel --presets=blueflag --plugins=transform-class-properties src --out-dir lib",
     "prepublish": "yarn build"
   },
   "repository": {
@@ -22,7 +22,7 @@
     "babel-cli": "^6.18.0",
     "babel-plugin-transform-class-properties": "^6.4.0",
     "babel-plugin-transform-strict-mode": "^6.3.13",
-    "babel-preset-blueflag": "^0.0.1",
+    "babel-preset-blueflag": "^0.1.0",
     "react": "^15.4.1",
     "react-router": "^3.0.0"
   },
@@ -32,6 +32,7 @@
   },
   "dependencies": {
     "babel-loader": "^6.2.8",
+    "babel-preset-react-native": "^1.9.1",
     "eslint-config-blueflag": "^0.3.0",
     "stampy": "^0.7.0",
     "superagent": "^3.3.1"
