@@ -61,6 +61,8 @@ export default class BaseSignUpForm extends React.Component {
     constructor(props: Object) {
         super(props);
 
+        props.auth.setCognitoGatewayHost(props.cognitoGatewayHost);
+
         this.state = {
             isSaving: false,
             errors: []
@@ -118,8 +120,9 @@ export default class BaseSignUpForm extends React.Component {
                     this.setState({newUser: true});
                 })
                 .catch((err: Error) => {
-                    this.setState({errors: this.state.errors.concat([err.message])})
-                    console.error(err.stack);
+                    if(err.body) {
+                        this.setState({errors: this.state.errors.concat([err.body.message])});
+                    }
                 });
 
             // Clear errors

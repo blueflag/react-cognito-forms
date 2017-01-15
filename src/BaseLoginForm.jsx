@@ -33,7 +33,6 @@ export default class BaseLoginForm extends Component {
         super(props);
 
         props.auth.setCognitoGatewayHost(props.cognitoGatewayHost);
-
         this.state = {
             errors: [],
             token: null,
