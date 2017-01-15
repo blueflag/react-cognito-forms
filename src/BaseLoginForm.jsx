@@ -14,7 +14,8 @@ export default class BaseLoginForm extends Component {
         forgotPasswordPath: PropTypes.string,
         LoginComponent: PropTypes.func.isRequired,
         VerificationComponent: PropTypes.func.isRequired,
-        LoadingComponent: PropTypes.func.isRequired
+        LoadingComponent: PropTypes.func.isRequired,
+        WrappingComponent: React.PropTypes.element.isRequired
     };
 
     static defaultProps = {
@@ -141,10 +142,12 @@ export default class BaseLoginForm extends Component {
     render(): React.Element {
         const {token, verify, loading} = this.state;
         const {
+            children,
             renderForm,
             LoginComponent,
             VerificationComponent,
-            LoadingComponent
+            LoadingComponent,
+            WrappingComponent,
         } = this.props;
 
         const componentProps = {
@@ -182,6 +185,6 @@ export default class BaseLoginForm extends Component {
             }
         }
 
-        return this.props.children;
+        return <WrappingComponent>{children}</WrappingComponent>;
     }
 }

@@ -41,6 +41,7 @@ export default class LoginFormWrapper extends React.Component {
             LoginComponent={LoginComponent}
             LoadingComponent={LoadingComponent}
             VerificationComponent={VerificationForm}
+            WrappingComponent="div"
         />;
     }
 }
