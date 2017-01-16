@@ -15,7 +15,7 @@ export default class BaseLoginForm extends Component {
         LoginComponent: PropTypes.func.isRequired,
         VerificationComponent: PropTypes.func.isRequired,
         LoadingComponent: PropTypes.func.isRequired,
-        WrappingComponent: React.PropTypes.element.isRequired
+        WrappingComponent: React.PropTypes.node.isRequired
     };
 
     static defaultProps = {
