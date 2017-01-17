@@ -14,14 +14,10 @@ export default new Auth({
     },
     async retrieveToken(): string {
         try {
-            console.log('fetching');
-            var value = await AsyncStorage.getItem(STORAGE_KEY);
-            console.log('value', value);
-
-            return await AsyncStorage.getItem(STORAGE_KEY);
+            return await AsyncStorage.getItem(STORAGE_KEY) || '{}';
         } catch (error) {
-            console.log(error);
-          // Error retrieving data
+            console.log('error', error);
+            // Error retrieving data
         }
     }
 });

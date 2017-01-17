@@ -3,25 +3,28 @@ import superagent from 'superagent';
 
 export default class Authorization {
     constructor(props: Object = {}) {
-        function defaultStoreToken(token: string): string {
+        async function defaultStoreToken(token: string): Promise<string> {
             return token;
         }
 
-        function defaultRetrieveToken(): string {
+        async function defaultRetrieveToken(): Promise<string> {
             return JSON.stringify(this.tokenStore);
         }
 
         this.storeToken = props.storeToken || defaultStoreToken;
         this.retrieveToken = props.retrieveToken || defaultRetrieveToken;
         this.cognitoGatewayHost;
+        this.tokenStore = {};
 
-        var initalLocalStorage = JSON.parse(this.retrieveToken() || '{}');
-
-        this.tokenStore = {
-            accessToken: initalLocalStorage.accessToken,
-            idToken: initalLocalStorage.idToken,
-            refreshToken: initalLocalStorage.refreshToken
-        };
+        this.retrieveToken()
+            .then(data => {
+                const {accessToken, idToken, refreshToken} = JSON.parse(data || '{}')
+                this.tokenStore = {
+                    accessToken,
+                    idToken,
+                    refreshToken
+                };
+            });
 
         this.tokenChangeSubscriptions = {
             accessToken: [],
