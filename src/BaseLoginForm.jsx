@@ -9,17 +9,19 @@ export default class BaseLoginForm extends Component {
         location: PropTypes.object.isRequired,
         exclude: PropTypes.arrayOf(PropTypes.string),
         onTokenChange: PropTypes.func,
+        forceLogin: PropTypes.bool,
         loader: PropTypes.func,
         signUpPath: PropTypes.string,
         forgotPasswordPath: PropTypes.string,
         LoginComponent: PropTypes.func.isRequired,
         VerificationComponent: PropTypes.func.isRequired,
         LoadingComponent: PropTypes.func.isRequired,
-        WrappingComponent: React.PropTypes.node.isRequired
+        WrappingComponent: React.PropTypes.func.isRequired
     };
 
     static defaultProps = {
         renderForm: props => props.children,
+        forceLogin: false,
         auth: new Auth()
     };
 
@@ -55,7 +57,13 @@ export default class BaseLoginForm extends Component {
 
 
         // Force update token after subscription
-        this.props.auth.refreshToken();
+        auth
+            .refreshToken()
+            .catch(err => {
+                if(process.env.NODE_ENV === 'development') {
+                    console.warn('Fetching Refresh Token Failed', err);
+                }
+            });
 
         if (this.state.token && this.props.onTokenChange) {
             this.props.onTokenChange(this.state.token);
@@ -81,11 +89,13 @@ export default class BaseLoginForm extends Component {
                 this.onTokenChange(token);
             })
             .catch((err: Error) => {
-                this.setState({
-                    errors: [err.body.message],
-                    verify: err.body.code === 'UserNotConfirmedException',
-                    loading: false
-                });
+                if(err.body) {
+                    this.setState({
+                        errors: [err.body.message],
+                        verify: err.body.code === 'UserNotConfirmedException',
+                        loading: false
+                    });
+                }
             });
     }
     onResendVerificationCode(e: Event) {
@@ -144,10 +154,11 @@ export default class BaseLoginForm extends Component {
         const {
             children,
             renderForm,
+            forceLogin,
             LoginComponent,
             VerificationComponent,
             LoadingComponent,
-            WrappingComponent,
+            WrappingComponent
         } = this.props;
 
         const componentProps = {
@@ -170,7 +181,7 @@ export default class BaseLoginForm extends Component {
             });
         }
         // Only allow authenticated users
-        if (!token && !this.shouldExcludePath()) {
+        if (!token && !this.shouldExcludePath() || forceLogin) {
             if(!loading) {
                 return renderForm({
                     view: 'login',
@@ -185,6 +196,6 @@ export default class BaseLoginForm extends Component {
             }
         }
 
-        return <WrappingComponent>{children}</WrappingComponent>;
+        return <WrappingComponent>{React.Children.map(children, cc => React.cloneElement(cc, {auth: this.props.auth}))}</WrappingComponent>;
     }
 }

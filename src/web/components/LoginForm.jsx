@@ -9,7 +9,8 @@ import VerificationForm from './VerificationForm';
 import Errors from './Errors';
 import auth from '../auth';
 
-var LoadingComponent = () => <div>Loading...</div>
+var LoadingComponent = () => <div>Loading...</div>;
+var WrappingComponent = (props) => <div>{props.children}</div>;
 
 function LoginComponent(props: Object): React.Element {
 
@@ -41,7 +42,7 @@ export default class LoginFormWrapper extends React.Component {
             LoginComponent={LoginComponent}
             LoadingComponent={LoadingComponent}
             VerificationComponent={VerificationForm}
-            WrappingComponent="div"
+            WrappingComponent={WrappingComponent}
         />;
     }
 }

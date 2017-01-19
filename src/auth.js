@@ -60,18 +60,11 @@ export default class Authorization {
 
     setToken(key: string, token: string) {
         this.tokenStore[key] = token;
-        try {
-            Promise
-                .resolve()
-                .then(() => {
-                    return this.storeToken(JSON.stringify(this.tokenStore));
-                })
-                .then(() => {
-                    this.onTokenChange(key, token);
-                })
-        } catch(e) {
-            console.warn(e);
-        }
+        return this.storeToken(JSON.stringify(this.tokenStore))
+            .then((token) => {
+                this.onTokenChange(key, token);
+                return this.tokenStore;
+            });
     }
 
     getToken(key: string = 'accessToken'): Promise {
@@ -85,15 +78,15 @@ export default class Authorization {
      *  Update token from session
      */
     refreshToken(token: string): Promise {
-        const refreshToken = token || this.tokenStore.refreshToken;
-        if(refreshToken) {
-            return this.post('/refreshToken', {refreshToken})
-                .then(({accessToken, idToken}) => {
-                    this.setToken('idToken', idToken);
-                    this.setToken('accessToken', accessToken);
-                    return accessToken;
-                });
-        }
+        return this.getToken('refreshToken')
+            .then(refreshToken => {
+                return this.post('/refreshToken', {refreshToken: token || refreshToken})
+            })
+            .then(({accessToken, idToken}) => {
+                this.setToken('idToken', idToken);
+                this.setToken('accessToken', accessToken);
+                return accessToken;
+            });
     }
 
     /*
@@ -114,9 +107,11 @@ export default class Authorization {
      *  Sign Out
      */
     signOut() {
-        this.setToken('idToken', null);
-        this.setToken('accessToken', null);
-        this.setToken('refreshToken', null);
+        return Promise.all([
+            this.setToken('idToken', null),
+            this.setToken('accessToken', null),
+            this.setToken('refreshToken', null)
+        ]);
     }
 
     signOutGlobal(): Promise {
