@@ -70,8 +70,8 @@ export default class Authorization {
     getToken(key: string = 'accessToken'): Promise {
         return Promise
             .resolve()
-            .then(() => this.retrieveToken() || "{}")
-            .then(data => JSON.parse(data)[key]);
+            .then(() => this.retrieveToken())
+            .then(data => JSON.parse(data || "{}")[key]);
     }
 
     /*
