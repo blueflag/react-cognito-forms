@@ -4,7 +4,7 @@ import React from 'react';
 import BaseLoginForm from '../../BaseLoginForm';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
-import Label from 'stampy/lib/field/Label';
+import Label from 'stampy/lib/component/field/Label';
 
 import VerificationForm from './VerificationForm';
 import Errors from './Errors';
