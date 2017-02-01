@@ -4,6 +4,7 @@ import React from 'react';
 import BaseLoginForm from '../../BaseLoginForm';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
+import Label from 'stampy/lib/field/Label';
 
 import VerificationForm from './VerificationForm';
 import Errors from './Errors';
@@ -18,10 +19,10 @@ function LoginComponent(props: Object): React.Element {
 
     return <div>
         <form className="ReactCognitoForm" onSubmit={onLogin}>
-            <label>Email</label>
-            <Input type="email" name="email" placeholder="Email" onChange={onChange('username')}/>
-            <label>Password</label>
-            <Input type="password" name="password" placeholder="Password" onChange={onChange('password')}/>
+            <Label>Email</Label>
+            <Input modifier="text" type="email" name="email" placeholder="Email" onChange={onChange('username')}/>
+            <Label>Password</Label>
+            <Input modifier="text" type="password" name="password" placeholder="Password" onChange={onChange('password')}/>
             <Button type="submit">Sign In</Button>
         </form>
 
