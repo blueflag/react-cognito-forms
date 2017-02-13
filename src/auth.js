@@ -58,7 +58,7 @@ export default class Authorization {
             });
     }
 
-    setToken(key: string, token: string) {
+    setToken(key: string, token: string): Promise {
         this.tokenStore[key] = token;
         return this.storeToken(JSON.stringify(this.tokenStore))
             .then((token) => {
@@ -72,6 +72,17 @@ export default class Authorization {
             .resolve()
             .then(() => this.retrieveToken())
             .then(data => JSON.parse(data || "{}")[key]);
+    }
+
+    /**
+     * Forgot Password
+     */
+    forgotPasswordRequest(username: string): Promise {
+        return this.post('/forgotPasswordRequest', {username});
+    }
+
+    forgotPasswordConfirm(username: string, confirmationCode: string, password: string): Promise {
+        return this.post('/forgotPasswordConfirm', {username, confirmationCode, password});
     }
 
     /*
@@ -128,11 +139,12 @@ export default class Authorization {
      */
     signUp(username: string, password: string, attributes: Object): Promise {
         return this.post('/signUp', {username, password, attributes})
-            .then(({accessToken, idToken, refreshToken}) => {
+            .then((data) => {
+                const {accessToken, idToken, refreshToken} = data;
                 this.setToken('accessToken', accessToken);
                 this.setToken('idToken', idToken);
                 this.setToken('refreshToken', refreshToken);
-                return accessToken;
+                return data;
             });
     }
 

@@ -1,28 +1,22 @@
 /* @flow */
 
 import React from 'react';
-import Auth from './auth';
+import BaseFormHock from './BaseFormHock';
 
-export default class BaseSignUpForm extends React.Component {
+class BaseSignUpForm extends React.Component {
     static propTypes = {
+        beforeValidation: React.PropTypes.func,
         fields: React.PropTypes.arrayOf(React.PropTypes.object),
         usernameKey: React.PropTypes.string,
         passwordKey: React.PropTypes.string,
         passwordConfirmKey: React.PropTypes.string,
-        CompleteComponent: React.PropTypes.func,
-        SignUpComponent: React.PropTypes.func
+        SignUpComponent: React.PropTypes.func.isRequired,
+        VerificationComponent: React.PropTypes.func.isRequired
     };
 
     static defaultProps = {
-        auth: new Auth(),
+        beforeValidation: fields => fields,
         renderForm: props => props.children,
-        CompleteComponent: () => {
-            return <span>
-                <span>User created successfully. </span>
-                <a href="/">Please login.</a>
-            </span>
-        },
-        SignUpComponent: () => <div>SignUpComponent</div>,
         fields: [
             {
                 name: 'name',
@@ -53,58 +47,33 @@ export default class BaseSignUpForm extends React.Component {
         passwordConfirmKey: 'passwordConfirm'
     };
 
-    state: Object;
     getValues: Function;
     onSubmit: (e: Event) => void;;
     onValidate: Function;
-
     constructor(props: Object) {
         super(props);
-
-        props.auth.setCognitoGatewayHost(props.cognitoGatewayHost);
-
-        this.state = {
-            isSaving: false,
-            errors: []
-        };
-
         this.getValues = this.getValues.bind(this);
-        this.onChange = this.onChange.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onValidate = this.onValidate.bind(this);
     }
-    onChange(key: string): Function {
-        return (newValue: Object) => {
-            this.setState({
-                signup: {
-                    ...this.state.signup,
-                    [key]: newValue
-                }
-            });
-        }
-    }
-
     getValues(): Object {
-        const {signup} = this.state;
-
         return this.props.fields
             .filter((ff: Object): boolean => {
                 if (ff.required) {
                     return true;
                 }
-
                 // Ignore fields that are empty and not required
-                return !!signup[ff.name];
+                return !!this.props[ff.name];
             })
             .reduce((reduction: Object, field: Object): Object => {
-                reduction[field.name] = signup[field.name];
+                reduction[field.name] = this.props[field.name];
                 return reduction;
             }, {});
     }
     onSubmit(e: Event) {
         e.preventDefault();
 
-        const attributes = this.getValues();
+        const attributes = this.props.beforeValidation(this.getValues());
         const isValid = this.onValidate(attributes);
 
         if (isValid) {
@@ -116,17 +85,17 @@ export default class BaseSignUpForm extends React.Component {
             delete attributes[this.props.passwordConfirmKey];
 
             this.props.auth.signUp(username, password, attributes)
-                .then(() => {
-                    this.setState({newUser: true});
-                })
-                .catch((err: Error) => {
-                    if(err.body) {
-                        this.setState({errors: this.state.errors.concat([err.body.message])});
+                .then((data) => {
+                    if(data.user) {
+                        this.props.onChange('username')(data.user.username);
                     }
-                });
+
+                    this.props.onChange('verify')(true);
+                })
+                .catch(this.props.errorHandler);
 
             // Clear errors
-            this.setState({errors: []});
+            this.props.onChange('errors')([]);
         }
     }
     onValidate(attributes: Object): boolean {
@@ -138,32 +107,35 @@ export default class BaseSignUpForm extends React.Component {
         }
 
         if (validationErrors.length > 0) {
-            this.setState({errors: this.state.errors.concat(validationErrors)});
+            this.props.onChange('errors')(this.props.errors.concat(validationErrors));
             return false;
         }
 
         return true;
     }
     render(): React.Element<any> {
-        const {CompleteComponent, SignUpComponent} = this.props;
-        const {onChange, onSubmit} = this;
+        const {SignUpComponent, VerificationComponent, renderForm, onChange, verify} = this.props;
+        const {onSubmit} = this;
         const componentProps = {
             ...this.props,
-            ...this.state,
+            onVerify: this.props.onVerify('/?userConfirmed=true'),
             onChange,
             onSubmit
         }
 
-        if(this.state.newUser) {
-            return this.props.renderForm({
-                view: 'signupComplete',
-                children: <CompleteComponent {...componentProps} />
+        if (verify) {
+            return renderForm({
+                view: 'verification',
+                children: <VerificationComponent {...componentProps} />
             });
         }
 
-        return this.props.renderForm({
+        return renderForm({
             view: 'signup',
             children: <SignUpComponent {...componentProps} />
         });
     }
 }
+
+const withBaseForm = BaseFormHock();
+export default withBaseForm(BaseSignUpForm);

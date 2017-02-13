@@ -1,16 +1,13 @@
 /* @flow */
 import React, {PropTypes, Component} from 'react';
-import Auth from './auth';
+import BaseFormHock from './BaseFormHock';
 
-export default class BaseLoginForm extends Component {
+class BaseLoginForm extends Component {
     static propTypes = {
-        auth: PropTypes.instanceOf(Auth),
-        cognitoGatewayHost: PropTypes.string.isRequired,
         location: PropTypes.object.isRequired,
         exclude: PropTypes.arrayOf(PropTypes.string),
         onTokenChange: PropTypes.func,
         forceLogin: PropTypes.bool,
-        loader: PropTypes.func,
         signUpPath: PropTypes.string,
         forgotPasswordPath: PropTypes.string,
         LoginComponent: PropTypes.func.isRequired,
@@ -21,39 +18,22 @@ export default class BaseLoginForm extends Component {
 
     static defaultProps = {
         renderForm: props => props.children,
-        forceLogin: false,
-        auth: new Auth()
+        forceLogin: false
     };
 
     onLogin: (e: Event) => void;
-    onResendVerificationCode: (e: Event) => void;
     onTokenChange: () => void;
     onVerified: () => void;
-    onVerify: (e: Event) => void;
-    state: Object;
 
     constructor(props: Object) {
         super(props);
-
-        props.auth.setCognitoGatewayHost(props.cognitoGatewayHost);
-        this.state = {
-            errors: [],
-            token: null,
-            loading: false
-        };
-
-        this.onChange = this.onChange.bind(this);
         this.onLogin = this.onLogin.bind(this);
-        this.onResendVerificationCode = this.onResendVerificationCode.bind(this);
         this.onTokenChange = this.onTokenChange.bind(this);
-        this.onVerified = this.onVerified.bind(this);
-        this.onVerify = this.onVerify.bind(this);
     }
     componentDidMount() {
         const {auth} = this.props;
         auth.subscribeTokenChange(this.onTokenChange);
-        auth.getToken().then(token => this.setState({token}));
-
+        auth.getToken().then(this.props.onChange('token'));
 
 
         // Force update token after subscription
@@ -65,76 +45,31 @@ export default class BaseLoginForm extends Component {
                 }
             });
 
-        if (this.state.token && this.props.onTokenChange) {
-            this.props.onTokenChange(this.state.token);
-        }
-    }
-    onChange(key: string): Function {
-        return (newValue: Object) => {
-            this.setState({[key]: newValue});
+        if (this.props.token && this.props.onTokenChange) {
+            this.props.onTokenChange(this.props.token);
         }
     }
     onLogin(e: Event) {
         e.preventDefault();
 
-        const {username, password} = this.state;
+        const {username, password} = this.props;
+        this.props.onChange('username')(username);
+        this.props.onChange('loading')(true);
 
-        this.setState({
-            username,
-            loading: true
-        });
-
+        console.log('onLogin');
         this.props.auth.signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);
             })
-            .catch((err: Error) => {
-                if(err.body) {
-                    this.setState({
-                        errors: [err.body.message],
-                        verify: err.body.code === 'UserNotConfirmedException',
-                        loading: false
-                    });
-                }
-            });
-    }
-    onResendVerificationCode(e: Event) {
-        e.preventDefault();
-
-        this.props.auth.signUpConfirmResend(this.state.username)
-            .then(() => {
-                this.setState({verificationCodeSent: true});
-            })
-            .catch((err: Error) => {
-                this.setState({errors: [err.message]});
-            });
+            .catch(this.props.errorHandler);
     }
     onTokenChange(token: string) {
-        this.setState({
-            token,
-            loading: false
-        });
+        this.props.onChange('token')(token);
+        this.props.onChange('loading')(false);
 
         if (this.props.onTokenChange) {
             this.props.onTokenChange(token);
         }
-    }
-    onVerified() {
-        this.setState({
-            errors: [],
-            verify: false
-        });
-    }
-    onVerify(e: Event) {
-        e.preventDefault();
-
-        this.props.auth.signUpConfirm(this.state.username, this.state.verification)
-            .then(() => {
-                this.onVerified();
-            })
-            .catch((err: Error) => {
-                this.setState({errors: [err.message]});
-            })
     }
     shouldExcludePath(): bool {
         const {location: {pathname}, exclude} = this.props;
@@ -150,26 +85,24 @@ export default class BaseLoginForm extends Component {
         return !!shouldExcldue;
     }
     render(): React.Element {
-        const {token, verify, loading} = this.state;
         const {
             children,
-            renderForm,
             forceLogin,
-            LoginComponent,
-            VerificationComponent,
+            loading,
             LoadingComponent,
+            LoginComponent,
+            renderForm,
+            token,
+            VerificationComponent,
+            verify,
             WrappingComponent
         } = this.props;
 
         const componentProps = {
             ...this.props,
-            ...this.state,
-            onChange: this.onChange,
             onLogin: this.onLogin,
-            onResendVerificationCode: this.onResendVerificationCode,
             onTokenChange: this.onTokenChange,
-            onVerified: this.onVerified,
-            onVerify: this.onVerify,
+            onVerify: this.props.onVerify('/?userConfirmed=true'),
             shouldExcludePath: this.shouldExcludePath
         };
 
@@ -199,3 +132,7 @@ export default class BaseLoginForm extends Component {
         return <WrappingComponent>{React.Children.map(children, cc => React.cloneElement(cc, {auth: this.props.auth}))}</WrappingComponent>;
     }
 }
+
+
+const withBaseForm = BaseFormHock();
+export default withBaseForm(BaseLoginForm);

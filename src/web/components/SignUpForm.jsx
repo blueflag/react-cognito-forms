@@ -6,6 +6,7 @@ import Button from 'stampy/lib/component/button/Button';
 import BaseSignUpForm from '../../BaseSignUpForm';
 import auth from '../auth';
 import Errors from './Errors';
+import VerificationForm from './VerificationForm';
 
 function SignUpComponent(props: Object): React.Element {
     const {
@@ -32,7 +33,7 @@ function SignUpComponent(props: Object): React.Element {
         });
 
     return <div>
-        <form onSubmit={onSubmit}>
+        <form onSubmit={onSubmit} method="post">
             {fieldItems}
             {isSaving ? null : <Button type="submit">Sign Up</Button>}
         </form>
@@ -52,6 +53,7 @@ export default function SignUpFormWrapper(props: Object): React.Element {
     return <BaseSignUpForm
         {...props}
         auth={auth}
+        VerificationComponent={VerificationForm}
         SignUpComponent={SignUpComponent}
     />;
 }
