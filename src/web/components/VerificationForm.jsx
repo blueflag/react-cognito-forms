@@ -1,6 +1,6 @@
 /* @flow */
 import React from 'react';
-import Errors from './Errors';
+import Messages from './Messages';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
 
@@ -23,7 +23,7 @@ export default class VerificationForm extends React.Component {
             </form>
             <a className="ReactCognitoLink ReactCognitoLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>
             {verificationCodeSent && <div>Verification code has been sent!</div>}
-            <Errors errors={errors} />
+            <Messages errors={errors} />
         </div>;
     }
 }

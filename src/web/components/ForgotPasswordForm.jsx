@@ -5,7 +5,7 @@ import BaseForgotPasswordForm from '../../BaseForgotPasswordForm';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
 import Label from 'stampy/lib/component/field/Label';
-import Errors from './Errors';
+import Messages from './Messages';
 import auth from '../auth';
 
 function RequestComponent(props: Object): React.Element {
@@ -17,7 +17,7 @@ function RequestComponent(props: Object): React.Element {
             <Input spruceName="ReactCognitoFormInput" modifier="text" type="email" name="email" placeholder="Email" onChange={onChange('username')}/>
             <Button spruceName="ReactCognitoFormButton" type="submit">Reset Password</Button>
         </form>
-        <Errors errors={errors} />
+        <Messages errors={errors} />
     </div>;
 }
 
@@ -32,7 +32,7 @@ function ConfirmComponent(props: Object): React.Element {
             <Input spruceName="ReactCognitoFormInput" modifier="text" type="password" name="password" placeholder="Password" onChange={onChange('password')}/>
             <Button spruceName="ReactCognitoFormButton" type="submit">Change Password</Button>
         </form>
-        <Errors errors={errors} />
+        <Messages errors={errors} />
     </div>;
 }
 

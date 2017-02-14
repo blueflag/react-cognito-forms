@@ -5,7 +5,7 @@ import Button from 'stampy/lib/component/button/Button';
 
 import BaseSignUpForm from '../../BaseSignUpForm';
 import auth from '../auth';
-import Errors from './Errors';
+import Messages from './Messages';
 import VerificationForm from './VerificationForm';
 
 function SignUpComponent(props: Object): React.Element {
@@ -37,7 +37,7 @@ function SignUpComponent(props: Object): React.Element {
             {fieldItems}
             {isSaving ? null : <Button type="submit">Sign Up</Button>}
         </form>
-        <Errors errors={errors} />
+        <Messages errors={errors} />
     </div>;
 }
 
