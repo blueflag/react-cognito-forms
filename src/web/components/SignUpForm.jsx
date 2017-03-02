@@ -8,6 +8,23 @@ import auth from '../auth';
 import Messages from './Messages';
 import VerificationForm from './VerificationForm';
 
+function RenderField(props: Object): React.Element<any> {
+    const {
+        name,
+        type,
+        placeholder,
+        onChange,
+        ...rest
+    } = props;
+    return <Input
+        name={name}
+        type={type}
+        onChange={onChange}
+        placeholder={placeholder}
+        {...rest}
+    />;
+}
+
 function SignUpComponent(props: Object): React.Element {
     const {
         isSaving,
@@ -19,15 +36,16 @@ function SignUpComponent(props: Object): React.Element {
 
     const fieldItems = fields
         .map((field: Object) => {
-            const {name, type, title, placeholder, ...rest} = field;
+            const {
+                name,
+                title,
+                component: Component = RenderField
+            } = field;
             return <div key={name} className="ReactCognitoField">
                 <label>{title}</label>
-                <Input
-                    name={name}
-                    type={type}
+                <Component
+                    {...field}
                     onChange={onChange(name)}
-                    placeholder={placeholder}
-                    {...rest}
                 />
             </div>
         });
