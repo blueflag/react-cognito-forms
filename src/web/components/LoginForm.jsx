@@ -14,14 +14,14 @@ var LoadingComponent = () => <div>Loading...</div>;
 var WrappingComponent = (props) => <div>{props.children}</div>;
 
 function LoginComponent(props: Object): React.Element {
-    const {forgotPasswordPath, signUpPath, onChange, onLogin, errors, messages} = props;
+    const {forgotPasswordPath, signUpPath, onChange, onLogin, errors, messages, username, password} = props;
 
     return <div>
         <form className="ReactCognitoForm" onSubmit={onLogin} method="post">
             <Label>Email</Label>
-            <Input modifier="text" type="email" name="email" placeholder="Email" onChange={onChange('username')}/>
+            <Input modifier="text" type="email" name="email" placeholder="Email" value={username} onChange={onChange('username')}/>
             <Label>Password</Label>
-            <Input modifier="text" type="password" name="password" placeholder="Password" onChange={onChange('password')}/>
+            <Input modifier="text" type="password" name="password" placeholder="Password" value={password} onChange={onChange('password')}/>
             <Button type="submit">Sign In</Button>
         </form>
         <Messages errors={errors} messages={messages} />

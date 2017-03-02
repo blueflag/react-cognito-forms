@@ -56,7 +56,6 @@ class BaseLoginForm extends Component {
         this.props.onChange('username')(username);
         this.props.onChange('loading')(true);
 
-        console.log('onLogin');
         this.props.auth.signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);

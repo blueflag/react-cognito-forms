@@ -14,11 +14,11 @@ export default class VerificationForm extends React.Component {
     };
 
     render(): React.Element {
-        const {onChange, onVerify, onVerifyResend, verificationCodeSent, errors} = this.props;
+        const {onChange, onVerify, onVerifyResend, verificationCodeSent, errors, verification} = this.props;
         return <div>
             <form className="ReactCognitoForm" onSubmit={onVerify} method="post">
                 <label>Verification Code</label>
-                <Input placeholder="Verification Code" onChange={onChange('verification')} />
+                <Input placeholder="Verification Code" value={verification} onChange={onChange('verification')} />
                 <Button type="submit">Confirm</Button>
             </form>
             <a className="ReactCognitoLink ReactCognitoLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>
