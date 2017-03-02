@@ -2267,6 +2267,10 @@ react-deep-force-update@^1.0.0:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/react-deep-force-update/-/react-deep-force-update-1.0.1.tgz#f911b5be1d2a6fe387507dd6e9a767aa2924b4c7"
 
+react-immutable-proptypes@^2.1.0:
+  version "2.1.0"
+  resolved "https://registry.yarnpkg.com/react-immutable-proptypes/-/react-immutable-proptypes-2.1.0.tgz#023d6f39bb15c97c071e9e60d00d136eac5fa0b4"
+
 react-input-autosize@^1.1.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/react-input-autosize/-/react-input-autosize-1.1.0.tgz#3fe1ac832387d8abab85f6051ceab1c9e5570853"
@@ -2545,15 +2549,16 @@ sshpk@^1.7.0:
     jsbn "~0.1.0"
     tweetnacl "~0.14.0"
 
-stampy@^0.12.0:
-  version "0.12.0"
-  resolved "https://registry.yarnpkg.com/stampy/-/stampy-0.12.0.tgz#787367a3deaca5a8d5011980bd46cc806bb43c91"
+stampy@^0.13.2:
+  version "0.13.2"
+  resolved "https://registry.yarnpkg.com/stampy/-/stampy-0.13.2.tgz#e92896d4b77b14ae4184c6ba7dc9dfa7c3777c03"
   dependencies:
     bruce "^0.9.0"
     classnames "^2.2.5"
     element-resize-detector "^1.1.9"
     immutable "^3.8.1"
     proxyquire "^1.7.11"
+    react-immutable-proptypes "^2.1.0"
     react-select "^1.0.0-rc.2"
 
 strict-uri-encode@^1.0.0:

@@ -118,6 +118,11 @@ class BaseSignUpForm extends React.Component {
         const {onSubmit} = this;
         const componentProps = {
             ...this.props,
+            fields: this.props.fields.map(ii => {
+                var stateValue = this.props[ii.name];
+                ii.value = (stateValue === undefined || stateValue === null) ? ii.defualtValue : stateValue;
+                return ii;
+            }),
             onVerify: this.props.onVerify('/?userConfirmed=true'),
             onChange,
             onSubmit
