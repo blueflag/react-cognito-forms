@@ -48,13 +48,16 @@ class BaseSignUpForm extends React.Component {
     };
 
     getValues: Function;
-    onSubmit: (e: Event) => void;;
+    onSubmit: (e: Event) => void;
     onValidate: Function;
     constructor(props: Object) {
         super(props);
         this.getValues = this.getValues.bind(this);
         this.onSubmit = this.onSubmit.bind(this);
         this.onValidate = this.onValidate.bind(this);
+    }
+    getDefaultValue(value: any, defaultValue: any): any {
+        return (value === undefined || value === null) ? defaultValue : value;
     }
     getValues(): Object {
         return this.props.fields
@@ -66,7 +69,7 @@ class BaseSignUpForm extends React.Component {
                 return !!this.props[ff.name];
             })
             .reduce((reduction: Object, field: Object): Object => {
-                reduction[field.name] = this.props[field.name];
+                reduction[field.name] = this.getDefaultValue(this.props[field.name], field.defaultValue);
                 return reduction;
             }, {});
     }
@@ -119,8 +122,7 @@ class BaseSignUpForm extends React.Component {
         const componentProps = {
             ...this.props,
             fields: this.props.fields.map(ii => {
-                var stateValue = this.props[ii.name];
-                ii.value = (stateValue === undefined || stateValue === null) ? ii.defualtValue : stateValue;
+                ii.value = this.getDefaultValue(this.props[ii.name], ii.defaultValue);
                 return ii;
             }),
             onVerify: this.props.onVerify('/?userConfirmed=true'),
