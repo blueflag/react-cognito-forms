@@ -27,8 +27,8 @@ function LoginComponent(props: Object): React.Element {
         <Messages errors={errors} messages={messages} />
 
         <div>
-            {signUpPath ? <a className="ReactCognitoLink ReactCognitoLink-signup" href={signUpPath}>Create an account</a> : null}
-            {forgotPasswordPath ? <a className="ReactCognitoLink ReactCognitoLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a> : null}
+            {signUpPath ? <a className="ReactCognitoFormLink ReactCognitoFormLink-signup" href={signUpPath}>Create an account</a> : null}
+            {forgotPasswordPath ? <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a> : null}
         </div>
 
     </div>;

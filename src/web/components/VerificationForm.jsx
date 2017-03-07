@@ -3,6 +3,7 @@ import React from 'react';
 import Messages from './Messages';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
+import Label from 'stampy/lib/component/field/Label';
 
 export default class VerificationForm extends React.Component {
     static propTypes = {
@@ -17,11 +18,11 @@ export default class VerificationForm extends React.Component {
         const {onChange, onVerify, onVerifyResend, verificationCodeSent, errors, verification} = this.props;
         return <div>
             <form className="ReactCognitoForm" onSubmit={onVerify} method="post">
-                <label>Verification Code</label>
-                <Input placeholder="Verification Code" value={verification} onChange={onChange('verification')} />
-                <Button type="submit">Confirm</Button>
+                <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
+                <Input spruceName="ReactCognitoFormInput" placeholder="Verification Code" value={verification} onChange={onChange('verification')} />
+                <Button spruceName="ReactCognitoFormButton" type="submit">Confirm</Button>
             </form>
-            <a className="ReactCognitoLink ReactCognitoLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>
+            <a className="ReactCognitoFormLink ReactCognitoFormLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>
             {verificationCodeSent && <div>Verification code has been sent!</div>}
             <Messages errors={errors} />
         </div>;
