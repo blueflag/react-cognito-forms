@@ -18,11 +18,11 @@ function LoginComponent(props: Object): React.Element {
 
     return <div>
         <form className="ReactCognitoForm" onSubmit={onLogin} method="post">
-            <Label>Email</Label>
-            <Input modifier="text" type="email" name="email" placeholder="Email" value={username} onChange={onChange('username')}/>
-            <Label>Password</Label>
-            <Input modifier="text" type="password" name="password" placeholder="Password" value={password} onChange={onChange('password')}/>
-            <Button type="submit">Sign In</Button>
+            <Label spruceName="ReactCognitoFormLabel">Email</Label>
+            <Input spruceName="ReactCognitoFormInput" modifier="text" type="email" name="email" placeholder="Email" value={username} onChange={onChange('username')}/>
+            <Label spruceName="ReactCognitoFormLabel">Password</Label>
+            <Input spruceName="ReactCognitoFormInput" modifier="text" type="password" name="password" placeholder="Password" value={password} onChange={onChange('password')}/>
+            <Button spruceName="ReactCognitoFormButton" type="submit">Sign In</Button>
         </form>
         <Messages errors={errors} messages={messages} />
 

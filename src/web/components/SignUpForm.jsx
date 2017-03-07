@@ -19,6 +19,7 @@ function RenderField(props: Object): React.Element<any> {
     return <Input
         name={name}
         type={type}
+        spruceName="ReactCognitoFormInput"
         onChange={onChange}
         placeholder={placeholder}
         {...rest}
@@ -53,7 +54,7 @@ function SignUpComponent(props: Object): React.Element {
     return <div>
         <form onSubmit={onSubmit} method="post">
             {fieldItems}
-            {isSaving ? null : <Button type="submit">Sign Up</Button>}
+            {isSaving ? null : <Button spruceName="ReactCognitoFormButton" type="submit">Sign Up</Button>}
         </form>
         <Messages errors={errors} />
     </div>;
