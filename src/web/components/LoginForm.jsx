@@ -13,9 +13,9 @@ import auth from '../auth';
 var LoadingComponent = () => <div>Loading...</div>;
 var WrappingComponent = (props) => <div>{props.children}</div>;
 
+
 function LoginComponent(props: Object): React.Element {
     const {forgotPasswordPath, signUpPath, onChange, onLogin, errors, messages, username, password} = props;
-
     return <div>
         <form className="ReactCognitoForm" onSubmit={onLogin} method="post">
             <Label spruceName="ReactCognitoFormLabel">Email</Label>

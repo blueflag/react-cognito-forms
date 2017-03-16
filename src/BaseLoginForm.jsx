@@ -49,8 +49,8 @@ class BaseLoginForm extends Component {
             this.props.onTokenChange(this.props.token);
         }
     }
-    onLogin(e: Event) {
-        e.preventDefault();
+    onLogin(event: Event) {
+        event.preventDefault();
 
         const {username, password} = this.props;
         this.props.onChange('username')(username);

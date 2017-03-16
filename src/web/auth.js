@@ -15,7 +15,8 @@ function testJSON(tokenString: string) {
 
 const auth = new Auth({
     async storeToken(token: string): Promise {
-        return localStorage.setItem(STORAGE_KEY, testJSON(token));
+        localStorage.setItem(STORAGE_KEY, testJSON(token));
+        return token;
     },
     async retrieveToken(): Promise<string> {
         return testJSON(localStorage.getItem(STORAGE_KEY));
