@@ -1,5 +1,6 @@
 /* @flow */
 import React from 'react';
+import PropTypes from 'prop-types';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
 
@@ -61,11 +62,11 @@ function SignUpComponent(props: Object): React.Element {
 }
 
 SignUpComponent.propTypes = {
-    errors: React.PropTypes.array,
-    fields: React.PropTypes.array,
-    isSaving: React.PropTypes.bool,
-    onChange: React.PropTypes.func,
-    onSubmit: React.PropTypes.func
+    errors: PropTypes.array,
+    fields: PropTypes.array,
+    isSaving: PropTypes.bool,
+    onChange: PropTypes.func,
+    onSubmit: PropTypes.func
 }
 
 export default function SignUpFormWrapper(props: Object): React.Element {

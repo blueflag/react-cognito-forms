@@ -1,5 +1,6 @@
 /* @flow */
 import React from 'react';
+import PropTypes from 'prop-types';
 import Messages from './Messages';
 import Input from 'stampy/lib/input/input/Input';
 import Button from 'stampy/lib/component/button/Button';
@@ -7,11 +8,11 @@ import Label from 'stampy/lib/component/field/Label';
 
 export default class VerificationForm extends React.Component {
     static propTypes = {
-        errors: React.PropTypes.array,
-        onChange: React.PropTypes.func,
-        onVerifyResend: React.PropTypes.func,
-        onVerify: React.PropTypes.func,
-        verificationCodeSent: React.PropTypes.bool
+        errors: PropTypes.array,
+        onChange: PropTypes.func,
+        onVerifyResend: PropTypes.func,
+        onVerify: PropTypes.func,
+        verificationCodeSent: PropTypes.bool
     };
 
     render(): React.Element {

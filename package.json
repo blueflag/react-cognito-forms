@@ -34,6 +34,7 @@
     "babel-loader": "^6.2.8",
     "babel-preset-react-native": "^1.9.1",
     "eslint-config-blueflag": "^0.3.0",
+    "prop-types": "^15.5.8",
     "stampy": "^0.13.2",
     "superagent": "^3.3.1"
   }

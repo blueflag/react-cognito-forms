@@ -1,12 +1,14 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
+
 import BaseFormHock from './BaseFormHock';
 
 class BaseSignUpForm extends React.Component {
     static propTypes = {
-        RequestComponent: React.PropTypes.func,
-        ConfirmComponent: React.PropTypes.func
+        RequestComponent: PropTypes.func,
+        ConfirmComponent: PropTypes.func
     };
 
     static defaultProps = {

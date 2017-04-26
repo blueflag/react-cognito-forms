@@ -1,17 +1,18 @@
 /* @flow */
 
 import React from 'react';
+import PropTypes from 'prop-types';
 import BaseFormHock from './BaseFormHock';
 
 class BaseSignUpForm extends React.Component {
     static propTypes = {
-        beforeValidation: React.PropTypes.func,
-        fields: React.PropTypes.arrayOf(React.PropTypes.object),
-        usernameKey: React.PropTypes.string,
-        passwordKey: React.PropTypes.string,
-        passwordConfirmKey: React.PropTypes.string,
-        SignUpComponent: React.PropTypes.func.isRequired,
-        VerificationComponent: React.PropTypes.func.isRequired
+        beforeValidation: PropTypes.func,
+        fields: PropTypes.arrayOf(PropTypes.object),
+        usernameKey: PropTypes.string,
+        passwordKey: PropTypes.string,
+        passwordConfirmKey: PropTypes.string,
+        SignUpComponent: PropTypes.func.isRequired,
+        VerificationComponent: PropTypes.func.isRequired
     };
 
     static defaultProps = {

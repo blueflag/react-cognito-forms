@@ -1,5 +1,6 @@
 /* @flow */
-import React, {PropTypes, Component} from 'react';
+import React, {Component} from 'react';
+import PropTypes from 'prop-types';
 import BaseFormHock from './BaseFormHock';
 
 class BaseLoginForm extends Component {
@@ -13,7 +14,7 @@ class BaseLoginForm extends Component {
         LoginComponent: PropTypes.func.isRequired,
         VerificationComponent: PropTypes.func.isRequired,
         LoadingComponent: PropTypes.func.isRequired,
-        WrappingComponent: React.PropTypes.func.isRequired
+        WrappingComponent: PropTypes.func.isRequired
     };
 
     static defaultProps = {
