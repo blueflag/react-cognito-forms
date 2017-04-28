@@ -12,7 +12,8 @@ class BaseSignUpForm extends React.Component {
         passwordKey: PropTypes.string,
         passwordConfirmKey: PropTypes.string,
         SignUpComponent: PropTypes.func.isRequired,
-        VerificationComponent: PropTypes.func.isRequired
+        VerificationComponent: PropTypes.func.isRequired,
+        onSignUp: PropTypes.func
     };
 
     static defaultProps = {
@@ -45,7 +46,8 @@ class BaseSignUpForm extends React.Component {
         ],
         usernameKey: 'email',
         passwordKey: 'password',
-        passwordConfirmKey: 'passwordConfirm'
+        passwordConfirmKey: 'passwordConfirm',
+        onSignUp: () => {}
     };
 
     getValues: Function;
@@ -96,6 +98,7 @@ class BaseSignUpForm extends React.Component {
 
                     this.props.onChange('verify')(true);
                 })
+                .then(this.props.onSignUp)
                 .catch(this.props.errorHandler);
 
             // Clear errors

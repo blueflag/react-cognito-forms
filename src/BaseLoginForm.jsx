@@ -14,11 +14,14 @@ class BaseLoginForm extends Component {
         LoginComponent: PropTypes.func.isRequired,
         VerificationComponent: PropTypes.func.isRequired,
         LoadingComponent: PropTypes.func.isRequired,
-        WrappingComponent: PropTypes.func.isRequired
+        WrappingComponent: PropTypes.func.isRequired,
+
+        onLogin: PropTypes.func
     };
 
     static defaultProps = {
         renderForm: props => props.children,
+        onLogin: () => {},
         forceLogin: false
     };
 
@@ -60,6 +63,7 @@ class BaseLoginForm extends Component {
         this.props.auth.signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);
+                this.props.onLogin();
             })
             .catch(this.props.errorHandler);
     }

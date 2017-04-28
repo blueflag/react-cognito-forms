@@ -30,7 +30,6 @@ function LoginComponent(props: Object): React.Element {
             {signUpPath ? <a className="ReactCognitoFormLink ReactCognitoFormLink-signup" href={signUpPath}>Create an account</a> : null}
             {forgotPasswordPath ? <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a> : null}
         </div>
-
     </div>;
 }
 
