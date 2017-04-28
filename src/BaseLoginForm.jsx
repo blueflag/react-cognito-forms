@@ -129,7 +129,7 @@ class BaseLoginForm extends Component {
             }
         }
 
-        return <WrappingComponent>{React.Children.map(children, cc => React.cloneElement(cc, {auth: this.props.auth}))}</WrappingComponent>;
+        return <WrappingComponent>{children}</WrappingComponent>;
     }
 }
 
