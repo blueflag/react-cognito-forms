@@ -7,6 +7,7 @@ import BaseFormHock from './BaseFormHock';
 class BaseSignUpForm extends React.Component {
     static propTypes = {
         beforeValidation: PropTypes.func,
+        onValidate: PropTypes.func,
         fields: PropTypes.arrayOf(PropTypes.object),
         usernameKey: PropTypes.string,
         passwordKey: PropTypes.string,
@@ -18,6 +19,7 @@ class BaseSignUpForm extends React.Component {
 
     static defaultProps = {
         beforeValidation: fields => fields,
+        onValidate: () => [],
         renderForm: props => props.children,
         fields: [
             {
@@ -106,17 +108,20 @@ class BaseSignUpForm extends React.Component {
         }
     }
     onValidate(attributes: Object): boolean {
-        const validationErrors = [];
+        let validationErrors = [];
 
         // Passwords must match
         if (attributes[this.props.passwordKey] !== attributes[this.props.passwordConfirmKey]) {
             validationErrors.push('Passwords do not match');
         }
 
+        validationErrors = validationErrors.concat(this.props.onValidate(attributes));
+
         if (validationErrors.length > 0) {
             this.props.onChange('errors')(this.props.errors.concat(validationErrors));
             return false;
         }
+
 
         return true;
     }
