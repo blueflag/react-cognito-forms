@@ -80,6 +80,7 @@ class BaseSignUpForm extends React.Component {
     }
     onSubmit(e: Event) {
         e.preventDefault();
+        this.props.onChange('errors')([]);
 
         const attributes = this.props.beforeValidation(this.getValues());
         const isValid = this.onValidate(attributes);
@@ -118,7 +119,13 @@ class BaseSignUpForm extends React.Component {
         validationErrors = validationErrors.concat(this.props.onValidate(attributes));
 
         if (validationErrors.length > 0) {
-            this.props.onChange('errors')(this.props.errors.concat(validationErrors));
+            this.props.errors
+            let errors = this.props.errors.concat(validationErrors);
+            let errorSet = Object.keys(errors.reduce((rr,ii) => {
+                rr[ii] = ii;
+                return rr;
+            }, {}));
+            this.props.onChange('errors')(errorSet);
             return false;
         }
 
