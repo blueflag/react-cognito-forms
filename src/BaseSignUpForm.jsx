@@ -95,7 +95,10 @@ class BaseSignUpForm extends React.Component {
 
             this.props.auth.signUp(username, password, attributes)
                 .then((data) => {
-                    this.props.onChange('username')(data.username);
+                    if(data.user) {
+                        this.props.onChange('username')(data.user.username);
+                    }
+
                     this.props.onChange('verify')(true);
                 })
                 .then(this.props.onSignUp)
