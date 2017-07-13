@@ -7,6 +7,7 @@ import BaseFormHock from './BaseFormHock';
 class BaseSignUpForm extends React.Component {
     static propTypes = {
         beforeValidation: PropTypes.func,
+        afterValidation: PropTypes.func,
         onValidate: PropTypes.func,
         fields: PropTypes.arrayOf(PropTypes.object),
         usernameKey: PropTypes.string,
@@ -19,6 +20,7 @@ class BaseSignUpForm extends React.Component {
 
     static defaultProps = {
         beforeValidation: fields => fields,
+        afterValidation: fields => fields,
         onValidate: () => [],
         renderForm: props => props.children,
         fields: [
@@ -82,10 +84,11 @@ class BaseSignUpForm extends React.Component {
         e.preventDefault();
         this.props.onChange('errors')([]);
 
-        const attributes = this.props.beforeValidation(this.getValues());
+        let attributes = this.props.beforeValidation(this.getValues());
         const isValid = this.onValidate(attributes);
 
         if (isValid) {
+            attributes = this.props.afterValidation(attributes);
             const username = attributes[this.props.usernameKey];
             const password = attributes[this.props.passwordKey];
 
