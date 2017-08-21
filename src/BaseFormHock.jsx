@@ -43,7 +43,18 @@ export default () => (ComposedComponent) => {
                     loading: false
                 });
 
-                if(err.body.code === 'UserNotConfirmedException') {
+                const userNotConfirmedException = 'UserNotConfirmedException';
+                if(
+                    // if cognito-gateway is using v0.5.0 or higher, it is using gromit.
+                    // look at contents of name for the user not confirmed exception
+                    err.body.name === userNotConfirmedException
+
+                    // @deprecated
+                    // if cognito-gateway is before v0.5.0, gromit is not used
+                    // so look at body.code for error message.
+                    // remove this check once all cognito-gateways are using cognito-gateway v0.5.0 or higher.
+                    || err.body.code === userNotConfirmedException
+                ) {
                     this.setState({
                         verify: true
                     })
