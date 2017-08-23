@@ -1433,6 +1433,10 @@ flat-cache@^1.2.1:
     graceful-fs "^4.1.2"
     write "^0.2.1"
 
+flow-bin@^0.48.0:
+  version "0.48.0"
+  resolved "https://registry.yarnpkg.com/flow-bin/-/flow-bin-0.48.0.tgz#72d075143524358db8901525e3c784dc13a7c7ee"
+
 for-in@^0.1.5:
   version "0.1.6"
   resolved "https://registry.yarnpkg.com/for-in/-/for-in-0.1.6.tgz#c9f96e89bfad18a545af5ec3ed352a1d9e5b4dc8"
@@ -1458,6 +1462,12 @@ form-data@^2.1.1, form-data@~2.1.1:
 formidable@^1.0.17:
   version "1.0.17"
   resolved "https://registry.yarnpkg.com/formidable/-/formidable-1.0.17.tgz#ef5491490f9433b705faa77249c99029ae348559"
+
+fronads@^0.7.1:
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/fronads/-/fronads-0.7.1.tgz#bfbbc8a0f27c2b361fbbf79227a57197a72d27f5"
+  dependencies:
+    flow-bin "^0.48.0"
 
 fs-readdir-recursive@^1.0.0:
   version "1.0.0"

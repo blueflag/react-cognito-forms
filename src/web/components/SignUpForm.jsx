@@ -10,6 +10,8 @@ import auth from '../auth';
 import Messages from './Messages';
 import VerificationForm from './VerificationForm';
 
+var LoadingComponent = () => <div>Loading...</div>;
+
 function RenderField(props: Object): React.Element<any> {
     const {
         name,
@@ -36,6 +38,8 @@ function SignUpComponent(props: Object): React.Element {
         errors,
         fields
     } = props;
+
+
 
     const fieldItems = fields
         .map((field: Object) => {
@@ -74,6 +78,7 @@ export default function SignUpFormWrapper(props: Object): React.Element {
     return <BaseSignUpForm
         {...props}
         auth={auth}
+        LoadingComponent={LoadingComponent}
         VerificationComponent={VerificationForm}
         SignUpComponent={SignUpComponent}
     />;

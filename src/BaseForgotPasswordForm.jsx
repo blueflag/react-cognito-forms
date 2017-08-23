@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-
+import {FetchingState, SuccessState} from './RequestState';
 import BaseFormHock from './BaseFormHock';
 
 class BaseSignUpForm extends React.Component {
@@ -26,9 +26,11 @@ class BaseSignUpForm extends React.Component {
     onRequest(ee: Event) {
         const {username} = this.props;
         ee.preventDefault();
+        this.props.onChange('requestState')(FetchingState());
         this.props.auth
             .forgotPasswordRequest(username)
             .then(() => {
+                this.props.onChange('requestState')(SuccessState());
                 this.props.onChange('confirm')(true);
             })
             .catch(this.props.errorHandler);
@@ -36,6 +38,7 @@ class BaseSignUpForm extends React.Component {
     onConfirm(ee: Event) {
         const {username, confirmationCode, password} = this.props;
         ee.preventDefault();
+        this.props.onChange('requestState')(FetchingState());
         this.props.auth
             .forgotPasswordConfirm(username, confirmationCode, password)
             .then(() => {
@@ -44,7 +47,16 @@ class BaseSignUpForm extends React.Component {
             .catch(this.props.errorHandler);
     }
     render(): React.Element<any> {
-        const {RequestComponent, ConfirmComponent, onChange, confirm, renderForm} = this.props;
+        const {
+            confirm,
+            ConfirmComponent,
+            LoadingComponent,
+            onChange,
+            renderForm,
+            RequestComponent,
+            requestState
+        } = this.props;
+
         const {onRequest, onConfirm} = this;
         const componentProps = {
             ...this.props,
@@ -53,17 +65,30 @@ class BaseSignUpForm extends React.Component {
             onConfirm
         }
 
-        if(confirm) {
+        const renderPage = () => {
+            if(confirm) {
+                return renderForm({
+                    view: 'forgotPasswordConfirm',
+                    children: <ConfirmComponent {...componentProps} />
+                });
+            }
+
             return renderForm({
-                view: 'forgotPasswordConfirm',
-                children: <ConfirmComponent {...componentProps} />
+                view: 'forgotPasswordRequest',
+                children: <RequestComponent {...componentProps} />
             });
         }
 
-        return renderForm({
-            view: 'forgotPasswordRequest',
-            children: <RequestComponent {...componentProps} />
-        });
+        return requestState
+                .fetchingMap(() => {
+                    return renderForm({
+                        view: 'loading',
+                        children: <LoadingComponent {...componentProps} />
+                    });
+                })
+                .successMap(renderPage)
+                .errorMap(renderPage)
+                .value(null);
     }
 }
 
