@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import BaseFormHock from './BaseFormHock';
+import {FetchingState, SuccessState, ErrorState} from './RequestState';
 
 class BaseSignUpForm extends React.Component {
     static propTypes = {
@@ -82,7 +83,8 @@ class BaseSignUpForm extends React.Component {
     }
     onSubmit(e: Event) {
         e.preventDefault();
-        this.props.onChange('errors')([]);
+        const onChangeRequestState = this.props.onChange('requestState');
+        onChangeRequestState(ErrorState([]));
 
         let attributes = this.props.beforeValidation(this.getValues());
         const isValid = this.onValidate(attributes);
@@ -96,19 +98,27 @@ class BaseSignUpForm extends React.Component {
             delete attributes[this.props.passwordKey];
             delete attributes[this.props.passwordConfirmKey];
 
+            onChangeRequestState(FetchingState());
             this.props.auth.signUp(username, password, attributes)
                 .then((data) => {
+                    const {verificationAttribute, verificationMedium, verificationValue} = data;
+
                     if(data.user) {
                         this.props.onChange('username')(data.user.username);
                     }
 
-                    this.props.onChange('verify')(true);
+                    onChangeRequestState(SuccessState());
+                    this.props.onChange({
+                        verify: true,
+                        verificationStatus: {
+                            verificationAttribute,
+                            verificationMedium,
+                            verificationValue
+                        }
+                    });
                 })
                 .then(this.props.onSignUp)
                 .catch(this.props.errorHandler);
-
-            // Clear errors
-            this.props.onChange('errors')([]);
         }
     }
     onValidate(attributes: Object): boolean {
@@ -128,7 +138,7 @@ class BaseSignUpForm extends React.Component {
                 rr[ii] = ii;
                 return rr;
             }, {}));
-            this.props.onChange('errors')(errorSet);
+            this.props.onChange('requestState')(ErrorState(errorSet));
             return false;
         }
 
@@ -136,8 +146,16 @@ class BaseSignUpForm extends React.Component {
         return true;
     }
     render(): React.Element<any> {
-        const {SignUpComponent, VerificationComponent, renderForm, onChange, verify} = this.props;
-        const {onSubmit} = this;
+        const {
+            LoadingComponent,
+            onChange,
+            renderForm,
+            requestState,
+            SignUpComponent,
+            VerificationComponent,
+            verify
+        } = this.props;
+
         const componentProps = {
             ...this.props,
             fields: this.props.fields.map(ii => {
@@ -146,20 +164,35 @@ class BaseSignUpForm extends React.Component {
             }),
             onVerify: this.props.onVerify('/?userConfirmed=true'),
             onChange,
-            onSubmit
+            onSubmit: this.onSubmit
         }
 
-        if (verify) {
+        const renderPage = () => {
+            // User has yet to be verified
+            if (verify) {
+                return renderForm({
+                    view: 'verification',
+                    children: <VerificationComponent {...componentProps} />
+                });
+            }
+
             return renderForm({
-                view: 'verification',
-                children: <VerificationComponent {...componentProps} />
+                view: 'signup',
+                children: <SignUpComponent {...componentProps} />
             });
         }
 
-        return renderForm({
-            view: 'signup',
-            children: <SignUpComponent {...componentProps} />
-        });
+        return requestState
+                .fetchingMap(() => {
+                    return renderForm({
+                        view: 'loading',
+                        children: <LoadingComponent {...componentProps} />
+                    });
+                })
+                .successMap(renderPage)
+                .errorMap(renderPage)
+                .value(null);
+
     }
 }
 

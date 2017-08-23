@@ -8,6 +8,8 @@ import Label from 'stampy/lib/component/field/Label';
 import Messages from './Messages';
 import auth from '../auth';
 
+var LoadingComponent = () => <div>Loading...</div>;
+
 function RequestComponent(props: Object): React.Element {
     const {onChange, onRequest, errors, username} = props;
 
@@ -31,7 +33,7 @@ function ConfirmComponent(props: Object): React.Element {
     } = props;
 
     return <div>
-        <form className="ReactCognitoForm" onSubmit={onConfirm} method="post">
+        <form autoComplete="off" className="ReactCognitoForm" onSubmit={onConfirm} method="post">
             <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
             <Input spruceName="ReactCognitoFormInput" modifier="text" type="text" name="confirmationCode" placeholder="e.g. 12345678" value={confirmationCode} onChange={onChange('confirmationCode')}/>
             <Label spruceName="ReactCognitoFormLabel">New Password</Label>
@@ -48,6 +50,7 @@ export default class LoginFormWrapper extends React.Component {
             auth={auth}
             RequestComponent={RequestComponent}
             ConfirmComponent={ConfirmComponent}
+            LoadingComponent={LoadingComponent}
             {...this.props}
         />;
     }

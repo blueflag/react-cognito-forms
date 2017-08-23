@@ -21,7 +21,6 @@ const LoadingComponent = () => <View><Text>Loading...</Text></View>
 const WrappingComponent = (props) => <View style={styles.container}>{props.children}</View>
 
 function LoginComponent(props: Object): React.Element {
-
     const {forgotPasswordPath, signUpPath, onChange, onLogin, errors} = props;
 
     return <View style={styles.container}>

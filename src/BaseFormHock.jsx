@@ -2,6 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Auth from './auth';
+import {ErrorState, FetchingState, SuccessState} from './RequestState';
 
 export default () => (ComposedComponent) => {
     return class BaseFormHock extends React.Component {
@@ -22,6 +23,7 @@ export default () => (ComposedComponent) => {
             this.state = {
                 errors: [],
                 verificationCodeSent: false,
+                requestState: SuccessState(),
                 token: null,
                 loading: false
             };
@@ -30,19 +32,15 @@ export default () => (ComposedComponent) => {
             this.onChange = this.onChange.bind(this);
             this.onVerify = this.onVerify.bind(this);
             this.onVerifyResend = this.onVerifyResend.bind(this);
+            this.onChangeRequestState = this.onChange('requestState');
         }
         redirectHandler(url: string = '/'): Function {
             return () => {
                 window.location = url
             };
         }
-        errorHandler(err: Object) {
+        errorHandler(err: Object): * {
             if(err.body) {
-                this.setState({
-                    errors: [err.body.message],
-                    loading: false
-                });
-
                 const userNotConfirmedException = 'UserNotConfirmedException';
                 if(
                     // if cognito-gateway is using v0.5.0 or higher, it is using gromit.
@@ -55,13 +53,17 @@ export default () => (ComposedComponent) => {
                     // remove this check once all cognito-gateways are using cognito-gateway v0.5.0 or higher.
                     || err.body.code === userNotConfirmedException
                 ) {
-                    this.setState({
-                        verify: true
-                    })
+                    this.onChangeRequestState(FetchingState());
+                    return this.onVerifyResend(new MouseEvent({}));
                 }
             }
+
+            this.onChangeRequestState(ErrorState([err.body.message]));
         }
-        onChange(key: string): Function {
+        onChange(key: *): Function {
+            if(typeof key === 'object') {
+                return this.setState(key);
+            }
             return (newValue: Object) => {
                 this.setState({[key]: newValue});
             }
@@ -69,9 +71,21 @@ export default () => (ComposedComponent) => {
         onVerify(success: Function): Function {
             return (e: Event) =>  {
                 e.preventDefault();
-                const successHandler = (typeof success === 'function') ? success : this.redirectHandler(success);
+
+                const successHandler = (typeof success === 'function')
+                    ? success
+                    : this.redirectHandler(success);
+
                 const {username, verification} = this.state;
-                this.props.auth.signUpConfirm(username, verification)
+
+
+                this.onChangeRequestState(FetchingState());
+                this.props.auth
+                    .signUpConfirm(username, verification)
+                    .then(data => {
+                        // this.onChangeRequestState(SuccessState());
+                        return data;
+                    })
                     .then(successHandler)
                     .catch(this.errorHandler);
             }
@@ -80,9 +94,17 @@ export default () => (ComposedComponent) => {
             ee.preventDefault();
             const {username} = this.state;
 
-            this.props.auth.signUpConfirmResend(username)
-                .then(() => {
-                    this.setState({verificationCodeSent: true});
+            this.onChangeRequestState(FetchingState());
+            this.props.auth
+                .signUpConfirmResend(username)
+                .then((data) => {
+                    this.setState({
+                        requestState: SuccessState(),
+                        errors: [],
+                        verificationStatus: data,
+                        verify: true,
+                        verificationCodeSent: true
+                    });
                 })
                 .catch(this.errorHandler);
         }
@@ -99,6 +121,11 @@ export default () => (ComposedComponent) => {
             return <ComposedComponent
                 {...this.props}
                 {...this.state}
+                errors={
+                    this.state.requestState
+                        .errorMap(ii => ii)
+                        .value([])
+                }
                 messages={messages}
                 errorHandler={this.errorHandler}
                 onChange={this.onChange}

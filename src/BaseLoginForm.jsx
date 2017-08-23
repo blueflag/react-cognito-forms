@@ -2,6 +2,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import BaseFormHock from './BaseFormHock';
+import {FetchingState, SuccessState} from './RequestState';
 
 class BaseLoginForm extends Component {
     static propTypes = {
@@ -54,25 +55,38 @@ class BaseLoginForm extends Component {
         }
     }
     onLogin(event: Event) {
+        const {
+            auth,
+            errorHandler,
+            onChange,
+            onLogin,
+            password,
+            username
+        } = this.props;
+
         event.preventDefault();
+        onChange({
+            username,
+            requestState: FetchingState()
+        })
 
-        const {username, password} = this.props;
-        this.props.onChange('username')(username);
-        this.props.onChange('loading')(true);
-
-        this.props.auth.signIn(username, password)
+        auth
+            .signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);
-                this.props.onLogin();
+                onLogin();
             })
-            .catch(this.props.errorHandler);
+            .catch(errorHandler);
     }
     onTokenChange(token: string) {
-        this.props.onChange('token')(token);
-        this.props.onChange('loading')(false);
+        const {onChange, onTokenChange} = this.props;
+        onChange({
+            token,
+            requestState: SuccessState()
+        });
 
-        if (this.props.onTokenChange) {
-            this.props.onTokenChange(token);
+        if (onTokenChange) {
+            onTokenChange(token);
         }
     }
     shouldExcludePath(): bool {
@@ -92,10 +106,10 @@ class BaseLoginForm extends Component {
         const {
             children,
             forceLogin,
-            loading,
             LoadingComponent,
             LoginComponent,
             renderForm,
+            requestState,
             token,
             VerificationComponent,
             verify,
@@ -110,27 +124,34 @@ class BaseLoginForm extends Component {
             shouldExcludePath: this.shouldExcludePath
         };
 
-        // User has yet to be verified
-        if (verify === true) {
-            return renderForm({
-                view: 'verification',
-                children: <VerificationComponent {...componentProps} />
-            });
-        }
-        // Only allow authenticated users
-        if (!token && !this.shouldExcludePath() || forceLogin) {
-            if(!loading) {
+        const renderPage = () => {
+            // User has yet to be verified
+            if (verify === true) {
                 return renderForm({
-                    view: 'login',
-                    children: <LoginComponent {...componentProps} />
-                });
-
-            } else {
-                return renderForm({
-                    view: 'loading',
-                    children: <LoadingComponent {...componentProps} />
+                    view: 'verification',
+                    children: <VerificationComponent {...componentProps} />
                 });
             }
+
+            return renderForm({
+                view: 'login',
+                children: <LoginComponent {...componentProps} />
+            });
+        }
+
+
+        // Only allow authenticated users
+        if (!token && !this.shouldExcludePath() || forceLogin) {
+            return requestState
+                .fetchingMap(() => {
+                    return renderForm({
+                        view: 'loading',
+                        children: <LoadingComponent {...componentProps} />
+                    });
+                })
+                .successMap(renderPage)
+                .errorMap(renderPage)
+                .value(null);
         }
 
         return <WrappingComponent>{children}</WrappingComponent>;

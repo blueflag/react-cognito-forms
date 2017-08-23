@@ -12,11 +12,15 @@ export default class VerificationForm extends React.Component {
         onChange: PropTypes.func,
         onVerifyResend: PropTypes.func,
         onVerify: PropTypes.func,
+        verification: PropTypes.string,
+        verificationStatus: PropTypes.object,
+        requestState: PropTypes.object,
         verificationCodeSent: PropTypes.bool
     };
 
     render(): React.Element {
-        const {onChange, onVerify, onVerifyResend, verificationCodeSent, errors, verification} = this.props;
+        const {onChange, onVerify, onVerifyResend, verificationCodeSent, errors, verification, verificationStatus} = this.props;
+        const {verificationValue} = verificationStatus;
         return <div>
             <form className="ReactCognitoForm" onSubmit={onVerify} method="post">
                 <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
@@ -24,7 +28,7 @@ export default class VerificationForm extends React.Component {
                 <Button spruceName="ReactCognitoFormButton" type="submit">Confirm</Button>
             </form>
             <a className="ReactCognitoFormLink ReactCognitoFormLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>
-            {verificationCodeSent && <div>Verification code has been sent!</div>}
+            {verificationCodeSent && <div>Verification code has been sent to: {verificationValue}</div>}
             <Messages errors={errors} />
         </div>;
     }
