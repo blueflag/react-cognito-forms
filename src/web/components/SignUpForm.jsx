@@ -1,6 +1,7 @@
 /* @flow */
 import React from 'react';
 import PropTypes from 'prop-types';
+import Text from 'stampy/lib/component/text/Text';
 import Input from 'stampy/lib/input/input/Input';
 import Label from 'stampy/lib/component/field/Label';
 import Button from 'stampy/lib/component/button/Button';
@@ -20,6 +21,7 @@ function RenderField(props: Object): React.Element<any> {
         onChange,
         ...rest
     } = props;
+
     return <Input
         name={name}
         type={type}
@@ -46,10 +48,14 @@ function SignUpComponent(props: Object): React.Element {
             const {
                 name,
                 title,
+                hint,
                 component: Component = RenderField
             } = field;
             return <div key={name} className="ReactCognitoField">
-                <Label spruceName="ReactCognitoFormLabel">{title}</Label>
+                <Label spruceName="ReactCognitoFormLabel">
+                    {title}
+                    {hint && <Text modifier="smaller muted block light">{hint}</Text>}
+                </Label>
                 <Component
                     {...field}
                     onChange={onChange(name)}
