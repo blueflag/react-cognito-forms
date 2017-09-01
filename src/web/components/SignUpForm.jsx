@@ -54,7 +54,7 @@ function SignUpComponent(props: Object): React.Element {
             return <div key={name} className="ReactCognitoField">
                 <Label spruceName="ReactCognitoFormLabel">
                     {title}
-                    {hint && <Text modifier="smaller muted block light">{hint}</Text>}
+                    {hint && <Text modifier="smaller muted block thin">{hint}</Text>}
                 </Label>
                 <Component
                     {...field}
