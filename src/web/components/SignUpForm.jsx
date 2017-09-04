@@ -20,6 +20,7 @@ function RenderField(props: Object): React.Element<any> {
         onChange,
         ...rest
     } = props;
+
     return <Input
         name={name}
         type={type}
@@ -46,10 +47,16 @@ function SignUpComponent(props: Object): React.Element {
             const {
                 name,
                 title,
+                hint,
                 component: Component = RenderField
             } = field;
             return <div key={name} className="ReactCognitoField">
-                <Label spruceName="ReactCognitoFormLabel">{title}</Label>
+                <Label spruceName="ReactCognitoFormLabel">
+                    {title}
+                    {hint &&
+                        <Label spruceName="ReactCognitoFormLabel" modifier="sizeMilli">{hint}</Label>
+                    }
+                </Label>
                 <Component
                     {...field}
                     onChange={onChange(name)}
