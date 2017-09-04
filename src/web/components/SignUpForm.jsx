@@ -1,7 +1,6 @@
 /* @flow */
 import React from 'react';
 import PropTypes from 'prop-types';
-import Text from 'stampy/lib/component/text/Text';
 import Input from 'stampy/lib/input/input/Input';
 import Label from 'stampy/lib/component/field/Label';
 import Button from 'stampy/lib/component/button/Button';
@@ -54,7 +53,9 @@ function SignUpComponent(props: Object): React.Element {
             return <div key={name} className="ReactCognitoField">
                 <Label spruceName="ReactCognitoFormLabel">
                     {title}
-                    {hint && <Text modifier="smaller muted block thin">{hint}</Text>}
+                    {hint &&
+                        <Label spruceName="ReactCognitoFormLabel" modifier="sizeMilli">{hint}</Label>
+                    }
                 </Label>
                 <Component
                     {...field}
