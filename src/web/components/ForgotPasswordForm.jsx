@@ -35,9 +35,27 @@ function ConfirmComponent(props: Object): React.Element {
     return <div>
         <form autoComplete="off" className="ReactCognitoForm" onSubmit={onConfirm} method="post">
             <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
-            <Input spruceName="ReactCognitoFormInput" modifier="text" type="text" name="confirmationCode" placeholder="e.g. 12345678" value={confirmationCode} onChange={onChange('confirmationCode')}/>
+            <Input
+                spruceName="ReactCognitoFormInput"
+                modifier="text"
+                type="text"
+                name="confirmationCode"
+                placeholder="e.g. 12345678"
+                value={confirmationCode}
+                onChange={onChange('confirmationCode')}
+                inputProps={{autocomplete: "off"}}
+            />
             <Label spruceName="ReactCognitoFormLabel">New Password</Label>
-            <Input spruceName="ReactCognitoFormInput" modifier="text" type="password" name="password" placeholder="Password" value={password} onChange={onChange('password')}/>
+            <Input
+                spruceName="ReactCognitoFormInput"
+                modifier="text"
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={password}
+                onChange={onChange('password')}
+                inputProps={{autocomplete: "off"}}
+            />
             <Button spruceName="ReactCognitoFormButton" type="submit">Change Password</Button>
         </form>
         <Messages errors={errors} />
