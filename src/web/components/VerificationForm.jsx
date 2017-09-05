@@ -24,7 +24,13 @@ export default class VerificationForm extends React.Component {
         return <div>
             <form className="ReactCognitoForm" onSubmit={onVerify} method="post">
                 <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
-                <Input spruceName="ReactCognitoFormInput" placeholder="Verification Code" value={verification} onChange={onChange('verification')} />
+                <Input
+                    spruceName="ReactCognitoFormInput"
+                    placeholder="Verification Code"
+                    value={verification}
+                    onChange={onChange('verification')}
+                    inputProps={{autocomplete: "off"}}
+                />
                 <Button spruceName="ReactCognitoFormButton" type="submit">Confirm</Button>
             </form>
             <a className="ReactCognitoFormLink ReactCognitoFormLink-resendVerification" onClick={onVerifyResend}>Resend verification code</a>

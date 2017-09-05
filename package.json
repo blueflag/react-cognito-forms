@@ -36,7 +36,7 @@
     "eslint-config-blueflag": "^0.3.0",
     "fronads": "^0.7.1",
     "prop-types": "^15.5.8",
-    "stampy": "^0.21.1",
+    "stampy": "^0.33.0",
     "superagent": "^3.3.1"
   }
 }
