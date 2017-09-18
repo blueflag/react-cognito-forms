@@ -2,7 +2,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import BaseFormHock from './BaseFormHock';
-import {FetchingState, SuccessState} from './RequestState';
+import {FetchingState, SuccessState, ErrorState} from './RequestState';
 
 class BaseLoginForm extends Component {
     static propTypes = {
@@ -36,23 +36,28 @@ class BaseLoginForm extends Component {
         this.onTokenChange = this.onTokenChange.bind(this);
     }
     componentDidMount() {
-        const {auth} = this.props;
+        const {auth, onChange} = this.props;
         auth.subscribeTokenChange(this.onTokenChange);
-        auth.getToken().then(this.props.onChange('token'));
 
-
-        // Force update token after subscription
+        onChange('requestState')(FetchingState());
         auth
-            .refreshToken()
+            .getToken()
+            .then((token) => {
+                this.onTokenChange(token);
+                return auth.refreshToken();
+            })
+            .then(() => {
+                onChange({
+                    isTokenValid: true,
+                    requestState: SuccessState()
+                });
+            })
             .catch(err => {
                 if(process.env.NODE_ENV === 'development') {
                     console.warn('Fetching Refresh Token Failed', err);
                 }
+                onChange('requestState')(ErrorState());
             });
-
-        if (this.props.token && this.props.onTokenChange) {
-            this.props.onTokenChange(this.props.token);
-        }
     }
     onLogin(event: Event) {
         const {
@@ -74,38 +79,40 @@ class BaseLoginForm extends Component {
             .signIn(username, password)
             .then((token: string) => {
                 this.onTokenChange(token);
+                onChange({
+                    requestState: SuccessState(),
+                    isTokenValid: true
+                });
                 onLogin();
             })
             .catch(errorHandler);
     }
     onTokenChange(token: string) {
         const {onChange, onTokenChange} = this.props;
-        onChange({
-            token,
-            requestState: SuccessState()
-        });
+        onChange('token')(token);
 
-        if (onTokenChange) {
+        if(onTokenChange) {
             onTokenChange(token);
         }
     }
     shouldExcludePath(): bool {
         const {location: {pathname}, exclude} = this.props;
 
-        if (!exclude) {
+        if(!exclude) {
             return false;
         }
 
-        const shouldExcldue = exclude.find((path: string): bool => {
+        const shouldExclude = exclude.find((path: string): bool => {
             return pathname.startsWith(path);
         });
 
-        return !!shouldExcldue;
+        return !!shouldExclude;
     }
     render(): React.Element {
         const {
             children,
             forceLogin,
+            isTokenValid,
             LoadingComponent,
             LoginComponent,
             renderForm,
@@ -139,9 +146,8 @@ class BaseLoginForm extends Component {
             });
         }
 
-
         // Only allow authenticated users
-        if (!token && !this.shouldExcludePath() || forceLogin) {
+        if(!isTokenValid && !this.shouldExcludePath() || forceLogin) {
             return requestState
                 .fetchingMap(() => {
                     return renderForm({

@@ -25,6 +25,7 @@ export default () => (ComposedComponent) => {
                 verificationCodeSent: false,
                 requestState: SuccessState(),
                 token: null,
+                isTokenValid: false,
                 loading: false
             };
 
