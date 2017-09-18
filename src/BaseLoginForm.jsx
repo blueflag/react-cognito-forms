@@ -53,9 +53,6 @@ class BaseLoginForm extends Component {
                 });
             })
             .catch(err => {
-                if(process.env.NODE_ENV === 'development') {
-                    console.warn('Fetching Refresh Token Failed', err);
-                }
                 onChange('requestState')(ErrorState());
             });
     }
