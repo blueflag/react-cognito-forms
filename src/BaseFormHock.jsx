@@ -8,12 +8,25 @@ export default () => (ComposedComponent) => {
     return class BaseFormHock extends React.Component {
 
         static propTypes = {
-            cognitoGatewayHost: PropTypes.string.isRequired
+            cognitoGatewayHost: PropTypes.string.isRequired,
+
+            /**
+             * onError callback, receives an array of error objects,
+             * each with at least a message property. The following
+             * are examples of the error object shape:
+             * e.g.
+             *      {message: 'Passwords do not match'}
+             *
+             * or a gromit error object:
+             *      {message: 'User not invited', name: 'UserNotInvited', code: 400}
+             */
+            onError: PropTypes.func
         }
 
         static defaultProps = {
             auth: new Auth(),
-            renderForm: props => props.children
+            renderForm: props => props.children,
+            onError: (ee) => ee
         };
 
         constructor(props: Object) {
@@ -58,6 +71,8 @@ export default () => (ComposedComponent) => {
                     return this.onVerifyResend(new MouseEvent({}));
                 }
             }
+
+            this.props.onError([err.body]);
 
             this.onChangeRequestState(ErrorState([err.body.message]));
         }
