@@ -131,6 +131,8 @@ class BaseSignUpForm extends React.Component {
 
         validationErrors = validationErrors.concat(this.props.onValidate(attributes));
 
+        this.props.onError(validationErrors.map(message => ({message})));
+
         if (validationErrors.length > 0) {
             this.props.errors
             let errors = this.props.errors.concat(validationErrors);
@@ -141,7 +143,6 @@ class BaseSignUpForm extends React.Component {
             this.props.onChange('requestState')(ErrorState(errorSet));
             return false;
         }
-
 
         return true;
     }
