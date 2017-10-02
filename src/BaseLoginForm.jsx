@@ -46,15 +46,15 @@ class BaseLoginForm extends Component {
                 this.onTokenChange(token);
                 return auth.refreshToken();
             })
-            .then(() => {
-                onChange({
-                    isTokenValid: true,
-                    requestState: SuccessState()
-                });
-            })
-            .catch(err => {
-                onChange('requestState')(ErrorState());
-            });
+            .then(
+                () => {
+                    onChange({
+                        isTokenValid: true,
+                        requestState: SuccessState()
+                    });
+                },
+                () => onChange('requestState')(ErrorState())
+            );
     }
     onLogin(event: Event) {
         const {
