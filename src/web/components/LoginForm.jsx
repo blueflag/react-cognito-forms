@@ -16,12 +16,23 @@ var WrappingComponent = (props) => <div>{props.children}</div>;
 
 function LoginComponent(props: Object): React.Element {
     const {forgotPasswordPath, signUpPath, onChange, onLogin, errors, messages, username, password} = props;
+
+    const usernameInputProps = {
+        name: 'email',
+        autoComplete: 'username'
+    }
+
+    const passwordInputProps = {
+        name: 'password',
+        autoComplete: 'password'
+    }
+
     return <div>
         <form className="ReactCognitoForm" onSubmit={onLogin} method="post">
             <Label spruceName="ReactCognitoFormLabel">Email</Label>
-            <Input spruceName="ReactCognitoFormInput" modifier="text" type="email" name="email" placeholder="Email" value={username} onChange={onChange('username')}/>
+            <Input spruceName="ReactCognitoFormInput" modifier="text" type="email" placeholder="Email" value={username} onChange={onChange('username')} inputProps={usernameInputProps} />
             <Label spruceName="ReactCognitoFormLabel">Password</Label>
-            <Input spruceName="ReactCognitoFormInput" modifier="text" type="password" name="password" placeholder="Password" value={password} onChange={onChange('password')}/>
+            <Input spruceName="ReactCognitoFormInput" modifier="text" type="password" placeholder="Password" value={password} onChange={onChange('password')} inputProps={passwordInputProps} />
             <Button spruceName="ReactCognitoFormButton" type="submit">Sign In</Button>
         </form>
         <Messages errors={errors} messages={messages} />

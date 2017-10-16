@@ -34,13 +34,19 @@ class BaseSignUpForm extends React.Component {
                 name: 'email',
                 title: 'Email',
                 type: 'email',
-                required: true
+                required: true,
+                inputProps: {
+                    autoComplete: 'username'
+                }
             },
             {
                 name: 'password',
                 title: 'Password',
                 type: 'password',
-                required: true
+                required: true,
+                inputProps: {
+                    autoComplete: 'password'
+                }
             },
             {
                 name: 'passwordConfirm',
