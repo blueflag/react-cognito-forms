@@ -100,9 +100,10 @@ class BaseSignUpForm extends React.Component {
             const username = attributes[this.props.usernameKey];
             const password = attributes[this.props.passwordKey];
 
-            // Exclude password from attributes
+            // Exclude username and password from attributes
             delete attributes[this.props.passwordKey];
             delete attributes[this.props.passwordConfirmKey];
+            delete attributes[this.props.usernameKey];
 
             onChangeRequestState(FetchingState());
             this.props.auth.signUp(username, password, attributes)
