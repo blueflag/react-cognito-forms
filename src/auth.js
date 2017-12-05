@@ -61,7 +61,7 @@ export default class Authorization {
     setToken(key: string, token: string): Promise {
         this.tokenStore[key] = token;
         return this.storeToken(JSON.stringify(this.tokenStore))
-            .then((token) => {
+            .then(() => {
                 this.onTokenChange(key, token);
                 return this.tokenStore;
             });
@@ -175,7 +175,11 @@ export default class Authorization {
      *  Notify all subscribers of token change
      */
     onTokenChange(key: string, token: string) {
-        this.tokenChangeSubscriptions[key].forEach((cb: Function) => cb(token));
+        Object.keys(this.tokenChangeSubscriptions)
+            .map(key => {
+                this.tokenChangeSubscriptions[key].forEach((cb: Function) => cb(token, key));
+            })
+        ;
     }
 }
 
