@@ -117,7 +117,7 @@ export default class Authorization {
     /*
      *  Sign Out
      */
-    signOut() {
+    signOut(): Promise<*> {
         return Promise.all([
             this.setToken('idToken', null),
             this.setToken('accessToken', null),
@@ -125,7 +125,7 @@ export default class Authorization {
         ]);
     }
 
-    signOutGlobal(): Promise {
+    signOutGlobal(): Promise<*> {
         return this.post('/signOutGlobal')
             .then(() => {
                 this.signOut();
@@ -176,7 +176,7 @@ export default class Authorization {
      */
     onTokenChange(key: string, token: string) {
         Object.keys(this.tokenChangeSubscriptions)
-            .map(key => {
+            .forEach(key => {
                 this.tokenChangeSubscriptions[key].forEach((cb: Function) => cb(token, key));
             })
         ;

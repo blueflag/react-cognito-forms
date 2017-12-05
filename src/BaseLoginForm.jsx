@@ -44,6 +44,9 @@ class BaseLoginForm extends Component {
             .getToken()
             .then((token) => {
                 this.onTokenChange(token);
+                if(!token) {
+                    return Promise.reject();
+                }
                 return auth.refreshToken();
             })
             .then(
@@ -88,6 +91,13 @@ class BaseLoginForm extends Component {
         const {onChange, onTokenChange} = this.props;
         onChange('token')(token);
 
+        if(!token) {
+            onChange({
+                isTokenValid: false,
+                requestState: ErrorState()
+            });
+        }
+
         if(onTokenChange) {
             onTokenChange(token);
         }
@@ -114,7 +124,6 @@ class BaseLoginForm extends Component {
             LoginComponent,
             renderForm,
             requestState,
-            token,
             VerificationComponent,
             verify,
             WrappingComponent
