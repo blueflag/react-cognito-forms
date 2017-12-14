@@ -33,14 +33,13 @@ function RenderField(props: Object): React.Element<any> {
 
 function SignUpComponent(props: Object): React.Element {
     const {
-        isSaving,
-        onSubmit,
-        onChange,
         errors,
-        fields
+        fields,
+        isSaving,
+        loginPath,
+        onChange,
+        onSubmit
     } = props;
-
-
 
     const fieldItems = fields
         .map((field: Object) => {
@@ -70,6 +69,9 @@ function SignUpComponent(props: Object): React.Element {
             {isSaving ? null : <Button spruceName="ReactCognitoFormButton" type="submit">Sign Up</Button>}
         </form>
         <Messages errors={errors} />
+        <div>
+            {loginPath && <a className="ReactCognitoFormLink ReactCognitoFormLink-login" href={loginPath}>Already have an account?</a>}
+        </div>
     </div>;
 }
 
@@ -77,6 +79,7 @@ SignUpComponent.propTypes = {
     errors: PropTypes.array,
     fields: PropTypes.array,
     isSaving: PropTypes.bool,
+    loginPath: PropTypes.string,
     onChange: PropTypes.func,
     onSubmit: PropTypes.func
 }
