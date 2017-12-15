@@ -1,109 +1,19 @@
 /* @flow */
 
 import React from 'react';
-import PropTypes from 'prop-types';
 import BaseForgotPasswordForm from '../../BaseForgotPasswordForm';
-import Input from 'stampy/lib/input/input/Input';
-import Button from 'stampy/lib/component/button/Button';
-import Label from 'stampy/lib/component/field/Label';
-import Messages from './Messages';
-import {UsernamePropTypes, UsernameDefaultProps} from './Props';
+import ForgotPasswordRequestForm from './ForgotPasswordRequestForm';
+import ForgotPasswordConfirmForm from './ForgotPasswordConfirmForm';
 import auth from '../auth';
 
 var LoadingComponent = () => <div>Loading...</div>;
-
-function RequestComponent(props: Object): React.Element {
-    const {
-        errors,
-        loginPath,
-        onChange,
-        onRequest,
-        username,
-        usernameProps
-    } = props;
-
-    return <div>
-        <form className="ReactCognitoForm" onSubmit={onRequest} method="post">
-            <Label spruceName="ReactCognitoFormLabel">{usernameProps.label}</Label>
-            <Input
-                spruceName="ReactCognitoFormInput"
-                modifier="text"
-                value={username}
-                onChange={onChange('username')}
-                inputProps={{autoComplete: 'username'}}
-                {...usernameProps}
-            />
-            <Button spruceName="ReactCognitoFormButton" type="submit">Reset Password</Button>
-        </form>
-        <Messages errors={errors} />
-        <div>
-            {loginPath && <a className="ReactCognitoFormLink ReactCognitoFormLink-login" href={loginPath}>Back to login</a>}
-        </div>
-    </div>;
-}
-
-RequestComponent.propTypes = {
-    errors: PropTypes.array,
-    loginPath: PropTypes.string,
-    onChange: PropTypes.func,
-    onRequest: PropTypes.func,
-    username: PropTypes.string,
-    usernameProps: UsernamePropTypes
-};
-
-RequestComponent.defaultProps = {
-    usernameProps: UsernameDefaultProps
-};
-
-function ConfirmComponent(props: Object): React.Element {
-    const {
-        confirmationCode,
-        errors,
-        loginPath,
-        onChange,
-        onConfirm,
-        password
-    } = props;
-
-    return <div>
-        <form autoComplete="off" className="ReactCognitoForm" onSubmit={onConfirm} method="post">
-            <Label spruceName="ReactCognitoFormLabel">Verification Code</Label>
-            <Input
-                spruceName="ReactCognitoFormInput"
-                modifier="text"
-                type="text"
-                name="confirmationCode"
-                placeholder="e.g. 12345678"
-                value={confirmationCode}
-                onChange={onChange('confirmationCode')}
-                inputProps={{autocomplete: "off"}}
-            />
-            <Label spruceName="ReactCognitoFormLabel">New Password</Label>
-            <Input
-                spruceName="ReactCognitoFormInput"
-                modifier="text"
-                type="password"
-                name="password"
-                placeholder="Password"
-                value={password}
-                onChange={onChange('password')}
-                inputProps={{autocomplete: "off"}}
-            />
-            <Button spruceName="ReactCognitoFormButton" type="submit">Change Password</Button>
-        </form>
-        <Messages errors={errors} />
-        <div>
-            {loginPath && <a className="ReactCognitoFormLink ReactCognitoFormLink-login" href={loginPath}>Back to login</a>}
-        </div>
-    </div>;
-}
 
 export default class LoginFormWrapper extends React.Component {
     render(): React.Element {
         return <BaseForgotPasswordForm
             auth={auth}
-            RequestComponent={RequestComponent}
-            ConfirmComponent={ConfirmComponent}
+            RequestComponent={ForgotPasswordRequestForm}
+            ConfirmComponent={ForgotPasswordConfirmForm}
             LoadingComponent={LoadingComponent}
             {...this.props}
         />;
