@@ -82,6 +82,7 @@ export default class Authorization {
     }
 
     forgotPasswordConfirm(username: string, confirmationCode: string, password: string): Promise {
+        confirmationCode = confirmationCode ? confirmationCode.trim() : confirmationCode;
         return this.post('/forgotPasswordConfirm', {username, confirmationCode, password});
     }
 
@@ -152,6 +153,7 @@ export default class Authorization {
      *  Confirm a Registered, Unauthenticated User
      */
     signUpConfirm(username: string, verificationCode: string): Promise {
+        verificationCode = verificationCode ? verificationCode.trim() : verificationCode;
         return this.post('/signUpConfirm', {username, verificationCode});
     }
 
