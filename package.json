@@ -1,6 +1,6 @@
 {
   "name": "react-cognito-forms",
-  "version": "0.27.0",
+  "version": "0.28.0",
   "description": "Forms built using React to handle common AWS Cognito tasks eg. Login, Forgot Password, Signup, Multi Factor Authentication and more",
   "main": "lib/web/index.js",
   "scripts": {
