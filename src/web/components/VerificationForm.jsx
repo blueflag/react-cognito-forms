@@ -29,7 +29,7 @@ export default class VerificationForm extends React.Component {
                     placeholder="Verification Code"
                     value={verification}
                     onChange={onChange('verification')}
-                    inputProps={{autocomplete: "off"}}
+                    inputProps={{autoComplete: "off"}}
                 />
                 <Button spruceName="ReactCognitoFormButton" type="submit">Confirm</Button>
             </form>

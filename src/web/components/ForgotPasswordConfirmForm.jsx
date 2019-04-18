@@ -29,7 +29,7 @@ export default function ForgotPasswordConfirmForm(props: Object): React.Element 
                 placeholder="e.g. 12345678"
                 value={confirmationCode}
                 onChange={onChange('confirmationCode')}
-                inputProps={{autocomplete: "off"}}
+                inputProps={{autoComplete: "off"}}
             />
             <Label spruceName="ReactCognitoFormLabel">New Password</Label>
             <Input
@@ -40,7 +40,7 @@ export default function ForgotPasswordConfirmForm(props: Object): React.Element 
                 placeholder="Password"
                 value={password}
                 onChange={onChange('password')}
-                inputProps={{autocomplete: "off"}}
+                inputProps={{autoComplete: "off"}}
             />
             <Button spruceName="ReactCognitoFormButton" type="submit">Change Password</Button>
         </form>
