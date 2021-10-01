@@ -60,8 +60,8 @@ function LoginComponent(props: Object): React.Element {
         </form>
         <Messages errors={errors} messages={messages} />
         <div>
-            {signUpPath && <a className="ReactCognitoFormLink ReactCognitoFormLink-signup" href={signUpPath}>Create an account</a>}
-            {forgotPasswordPath && <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href={forgotPasswordPath}>Forgot your password?</a>}
+            Returning user? <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href={forgotPasswordPath}>Reset password.</a>
+            First time user? <a className="ReactCognitoFormLink ReactCognitoFormLink-signup" href={signUpPath}>Sign up & activate account.</a>
         </div>
     </div>;
 }
