@@ -19,12 +19,10 @@ var WrappingComponent = (props) => <div>{props.children}</div>;
 function LoginComponent(props: Object): React.Element {
     const {
         errors,
-        forgotPasswordPath,
         messages,
         onChange,
         onLogin,
         password,
-        signUpPath,
         username,
         usernameProps
     } = props;
@@ -60,7 +58,7 @@ function LoginComponent(props: Object): React.Element {
         </form>
         <Messages errors={errors} messages={messages} />
         <div>
-            <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href={forgotPasswordPath}>Returning user? Reset password.</a>
+            <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href="/forgot-password">Returning user? Reset password.</a>
             <a className="ReactCognitoFormLink ReactCognitoFormLink-forgotPassword" href="/signup">First time user? Sign up &amp; activate account.</a>
         </div>
     </div>;
@@ -68,12 +66,10 @@ function LoginComponent(props: Object): React.Element {
 
 LoginComponent.propTypes = {
     errors: PropTypes.array,
-    forgotPasswordPath: PropTypes.string,
     messages: PropTypes.array,
     onChange: PropTypes.func,
     onLogin: PropTypes.func,
     password: PropTypes.string,
-    signUpPath: PropTypes.string,
     username: PropTypes.string,
     usernameProps: UsernamePropTypes
 };
